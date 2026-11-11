@@ -1,0 +1,6 @@
+{
+  "name": "Vanguard",
+  "description": "RPG de estrategia y combate táctico: mejorá tu base y equipo, y llevá a tu héroe a conquistar nuevos sectores.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

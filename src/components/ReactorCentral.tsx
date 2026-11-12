@@ -245,60 +245,90 @@ export const ReactorCentral: React.FC<ReactorCentralProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-5 text-slate-200 select-none">
-      {/* CABECERA DEL REACTOR CENTRAL */}
+      {/* CABECERA UNIFICADA DEL REACTOR CENTRAL (IDÉNTICA JERARQUÍA VISUAL Y BOTÓN QUE FORJA, LABORATORIO Y SILO) */}
       <header
-        className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 ${skin.panelContainer}`}
+        className={`w-full p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${skin.panelContainer}`}
       >
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-center gap-3.5 min-w-0">
           <div
-            className={`w-12 h-12 rounded-xl bg-[#182232]/75 border ${skin.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
+            className={`relative w-12 h-12 rounded-xl bg-[#182232]/80 border ${skin.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
           >
             <Zap className={`w-6 h-6 ${skin.accentText}`} />
+            <span
+              className={`absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 rounded bg-black/90 border border-white/20 text-xs font-mono font-bold ${skin.accentText} leading-none tabular-nums`}
+            >
+              Nv.{reactorLevel}
+            </span>
           </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
-              {skin.reactorTitle} · Nivel {reactorLevel}
-            </h1>
-            <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide leading-tight">
+                {skin.reactorTitle} · Nivel {reactorLevel}
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-200">
+                Techo de Instalaciones Nv.{reactorLevel}
+              </span>
+              <span className="text-xs font-mono text-slate-400 tabular-nums">
+                Red: <strong className="text-white">{totalUsedMw} / {totalCapacityMw} MW</strong>{' '}
+                <span className={`${skin.accentText} font-semibold`}>
+                  ({reserveMw} MW Libres)
+                </span>
+              </span>
+            </div>
+            <p className="text-[13px] sm:text-sm text-slate-300 mt-1 leading-snug">
               {skin.reactorSubtitle}
             </p>
           </div>
         </div>
 
-        {/* KPIs DE CARGA Y RESERVA (CAJAS GEMELAS DE IGUAL TAMAÑO) */}
-        <div className="grid grid-cols-2 gap-3 self-start md:self-center shrink-0">
-          <div
-            className={`min-w-[172px] px-4 py-2.5 flex flex-col justify-center items-end font-mono ${skin.subCardContainer}`}
-          >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
-              Carga de Red Activa
-            </span>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="text-base sm:text-lg font-bold text-white tabular-nums">
-                {totalUsedMw}
-              </span>
-              <span className="text-xs text-slate-500">/</span>
-              <span
-                className={`text-base sm:text-lg font-bold tabular-nums ${skin.accentText}`}
-              >
-                {totalCapacityMw} MW
-              </span>
-            </div>
-          </div>
+        {/* COSTES Y BOTÓN DE MEJORA ESTANDARIZADO (MISMA POSICIÓN Y TAMAÑO QUE FORJA, LAB Y SILO) */}
+        <div className="flex flex-wrap items-center gap-2.5 xl:justify-end shrink-0">
+          {!isMaxLevel &&
+            upgradeCosts.map((cost) => {
+              const hasEnough = cost.owned >= cost.required;
+              return (
+                <div
+                  key={cost.id}
+                  title={cost.label}
+                  className={`min-h-[42px] px-3.5 py-2 rounded-xl border font-mono text-[13px] flex items-center gap-2 tabular-nums ${
+                    hasEnough
+                      ? 'bg-black/45 border-white/12 text-slate-200'
+                      : 'bg-rose-950/40 border-rose-500/35 text-rose-200'
+                  }`}
+                >
+                  {renderStorageResourceIcon(cost.id)}
+                  <span className="text-slate-300">{cost.label}:</span>
+                  <span className="font-bold text-white">
+                    {cost.owned.toLocaleString('es-ES')} /{' '}
+                    {cost.required.toLocaleString('es-ES')}
+                  </span>
+                </div>
+              );
+            })}
 
-          <div
-            className={`min-w-[172px] px-4 py-2.5 flex flex-col justify-center items-end font-mono ${skin.subCardContainer}`}
+          <button
+            type="button"
+            disabled={!canUpgrade || isMaxLevel || isUpgrading}
+            onClick={handleTriggerUpgrade}
+            className={`min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider shrink-0 flex items-center justify-center gap-2 ${
+              isUpgrading
+                ? 'bg-amber-950/60 border border-amber-400/50 text-amber-200 cursor-wait'
+                : canUpgrade && !isMaxLevel
+                  ? `${getFactionTheme(factionId).primaryButton} ring-2 ring-emerald-400/80 shadow-[0_0_22px_rgba(16,185,129,0.45)] transition-all cursor-pointer`
+                  : 'bg-[#121824]/85 text-slate-500 border border-white/8 cursor-not-allowed'
+            }`}
           >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
-              Techo Operativo
+            {canUpgrade && !isMaxLevel && !isUpgrading && (
+              <span className="w-2 h-2 rounded-full bg-emerald-300 animate-ping shrink-0" />
+            )}
+            <span>
+              {isMaxLevel
+                ? 'Nivel Máximo'
+                : isUpgrading
+                  ? `Ampliando... (${upgradeRemainingSec}s)`
+                  : `Ampliar a Nv.${reactorLevel + 1}`}
             </span>
-            <span className="text-base sm:text-lg font-bold text-white tabular-nums mt-0.5">
-              NV. {reactorLevel}{' '}
-              <span className="text-xs font-normal text-slate-400">
-                / {maxReactorLevel}
-              </span>
-            </span>
-          </div>
+          </button>
         </div>
       </header>
 

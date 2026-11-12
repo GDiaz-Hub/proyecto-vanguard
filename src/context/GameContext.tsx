@@ -126,6 +126,7 @@ import {
   getBaseSpeedForFaction,
   getDefenseTypeForFaction,
   getPlanetHostilesRoster,
+  getTurnPortraitForSpriteUrl,
 } from '../data/factionIdentityCatalog';
 import { playGameSfx } from '../utils/soundSynthesizer';
 
@@ -371,7 +372,7 @@ function buildWaveSquad(
       illuminatedTurns: 0,
       intent: initialIntent,
       spriteUrl: picked.spriteUrl,
-      portraitUrl: picked.spriteUrl,
+      portraitUrl: getTurnPortraitForSpriteUrl(picked.spriteUrl),
       rewardCredits: picked.rewardCredits,
       rewardResourceId: primaryDrop.id,
       rewardAmount: primaryDrop.amount + (waveNumber - 1),
@@ -469,9 +470,12 @@ interface GameContextValue {
   forgeInitialTab: 'compuestos' | 'chasis';
   openForgeTab: (tab: 'compuestos' | 'chasis') => void;
 
-  // Botín acumulado en la sesión de combate
+  // Botín acumulado en la sesión de combate y acciones al finalizar incursión (Oleada 3/3)
   combatSessionLoot: CombatSessionLoot;
   clearCombatSessionLoot: () => void;
+  restartCurrentIncursion: () => void;
+  advanceToNextPlanetIncursion: () => void;
+  nextUnlockedPlanetName: string | null;
 
   selectedEnemy: CombatEnemy & { level?: number; spriteUrl?: string };
   enemySquad: CombatSquadUnit[];
@@ -678,6 +682,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   const [encounteredEnemyKeys, setEncounteredEnemyKeys] = useState<
     Record<string, boolean>
   >(savedState?.encounteredEnemyKeys ?? {});
+  const [clearedPlanetIds, setClearedPlanetIds] = useState<
+    Record<string, boolean>
+  >(savedState?.clearedPlanetIds ?? {});
 
   const [combatSpeed, setCombatSpeed] = useState<CombatSpeed>(1);
   const combatSpeedRef = useRef<CombatSpeed>(combatSpeed);
@@ -709,6 +716,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
           orionDeployedCount,
           claimedDirectives,
           encounteredEnemyKeys,
+          clearedPlanetIds,
         })
       );
     } catch {
@@ -734,6 +742,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     orionDeployedCount,
     claimedDirectives,
     encounteredEnemyKeys,
+    clearedPlanetIds,
   ]);
 
   const currentFaction = FACTIONS[factionId];
@@ -903,14 +912,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const totalWaves = 3;
   const [currentWave, setCurrentWave] = useState<number>(1);
-  const [enemySquad, setEnemySquad] = useState<CombatSquadUnit[]>(() =>
-    buildWaveSquad(defaultPlanet, 1, factionId, reactorRoutingMode, characterLevel)
+  const initialCombatWaveSquad = useMemo(
+    () =>
+      buildWaveSquad(defaultPlanet, 1, factionId, reactorRoutingMode, characterLevel),
+    // Solo se calcula una vez para poblar el estado inicial sincronizado entre enemySquad y turnOrderIds
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const [enemySquad, setEnemySquad] = useState<CombatSquadUnit[]>(
+    () => initialCombatWaveSquad
   );
   const [turnOrderIds, setTurnOrderIds] = useState<('player' | string)[]>(() =>
-    buildInitialTurnOrder(
-      buildWaveSquad(defaultPlanet, 1, factionId, reactorRoutingMode, characterLevel),
-      factionId
-    )
+    buildInitialTurnOrder(initialCombatWaveSquad, factionId)
   );
   const [selectedTargetId, setSelectedTargetId] = useState<string>('');
   const [turnPhase, setTurnPhase] = useState<CombatTurnPhase>('PLAYER_TURN');
@@ -1084,9 +1097,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [enemySquad, selectedTargetId]);
 
-  // Registrar enemigos avistados en el Frente de Batalla para desbloquear su silueta en el Archivo de Hostiles
+  // Registrar enemigos avistados ÚNICAMENTE cuando el jugador entra de forma efectiva al Frente de Batalla (activeTab === 'combate')
   useEffect(() => {
-    if (isSelectingFaction) return;
+    if (isSelectingFaction || activeTab !== 'combate') return;
     const keysToUnlock = enemySquad
       .filter((u) => u.hp > 0 && u.unitKey)
       .map((u) => u.unitKey as string);
@@ -1101,7 +1114,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       return next;
     });
-  }, [enemySquad, isSelectingFaction]);
+  }, [activeTab, enemySquad, isSelectingFaction]);
 
   const turnQueue: CombatTurnQueueItem[] = useMemo(() => {
     const playerSpeed =
@@ -1140,7 +1153,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         name: unit.name,
         faction: unit.faction,
         speed: unit.speed,
-        portraitUrl: unit.portraitUrl || HERO_PORTRAITS_MAP[unit.faction],
+        portraitUrl: getTurnPortraitForSpriteUrl(
+          unit.portraitUrl || unit.spriteUrl || HERO_PORTRAITS_MAP[unit.faction]
+        ),
         stunned: unit.stunnedTurns > 0,
         broken: unit.brokenTurns > 0,
         intent: unit.intent,
@@ -1196,6 +1211,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       setSkillCooldowns({ 1: 0, 2: 0, 3: 0 });
       setTurnPhase(initialOrder[0] === 'player' ? 'PLAYER_TURN' : 'ENEMY_TURN');
       setTurnCount(1);
+      setFloatingEvents([]);
+      setCombatSessionLoot({ credits: 0, wavesCleared: 0, items: [] });
     },
     [
       characterLevel,
@@ -1205,6 +1222,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       reactorRoutingMode,
     ]
   );
+
+  const prevActiveTabRef = useRef<ModuleTab>(activeTab);
+  useEffect(() => {
+    if (prevActiveTabRef.current === 'combate' && activeTab !== 'combate') {
+      resetCombatEncounter(activePlanet, factionId);
+    }
+    prevActiveTabRef.current = activeTab;
+  }, [activeTab, activePlanet, factionId, resetCombatEncounter]);
 
   const openForgeTab = useCallback((tab: 'compuestos' | 'chasis') => {
     setForgeInitialTab(tab);
@@ -1277,7 +1302,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   }, [activeTutorialScreenKey]);
 
-  const navigateToSector = (sector: StarSector, planet: Planet) => {
+  const navigateToSector = useCallback((sector: StarSector, planet: Planet) => {
     playGameSfx('ui_click');
     setCurrentLocation(planet.name);
     setActivePlanet(planet);
@@ -1289,7 +1314,60 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     pushLog(
       `[DESPLIEGUE] Incursión iniciada en ${planet.name} (Tier ${planet.tierRoman} · Amenaza: ${planet.threatLevel}).`
     );
-  };
+  }, [factionId, pushLog, resetCombatEncounter]);
+
+  const unlockedPlaytestPlanets = useMemo(() => {
+    const homeSecId =
+      factionId === 'valari'
+        ? 'SEC-VAL-01'
+        : factionId === 'skithid'
+          ? 'SEC-SKI-01'
+          : 'SEC-CYG-01';
+    const allowedSectors = SECTORS_DATA.filter(
+      (s) => s.id === homeSecId || s.id === 'SEC-NEU-WEST'
+    );
+    const list: { sector: StarSector; planet: Planet }[] = [];
+    allowedSectors.forEach((sec) => {
+      sec.planets.forEach((pl) => {
+        list.push({ sector: sec, planet: pl });
+      });
+    });
+    return list;
+  }, [factionId]);
+
+  const nextUnlockedPlanetEntry = useMemo(() => {
+    if (unlockedPlaytestPlanets.length === 0) return null;
+    const currentIdx = unlockedPlaytestPlanets.findIndex(
+      (item) => item.planet.id === activePlanet?.id
+    );
+    if (currentIdx >= 0 && currentIdx + 1 < unlockedPlaytestPlanets.length) {
+      return unlockedPlaytestPlanets[currentIdx + 1];
+    }
+    return unlockedPlaytestPlanets[0];
+  }, [activePlanet?.id, unlockedPlaytestPlanets]);
+
+  const nextUnlockedPlanetName = useMemo(() => {
+    if (!nextUnlockedPlanetEntry) return null;
+    return `${nextUnlockedPlanetEntry.planet.name} (Tier ${nextUnlockedPlanetEntry.planet.tierRoman})`;
+  }, [nextUnlockedPlanetEntry]);
+
+  const restartCurrentIncursion = useCallback(() => {
+    playGameSfx('ui_click');
+    resetCombatEncounter(activePlanet, factionId);
+    pushLog(
+      `[REINICIO TÁCTICO] Nueva incursión de 3 oleadas iniciada en ${
+        activePlanet?.name || 'Sector'
+      }.`
+    );
+  }, [activePlanet, factionId, pushLog, resetCombatEncounter]);
+
+  const advanceToNextPlanetIncursion = useCallback(() => {
+    if (!nextUnlockedPlanetEntry) return;
+    navigateToSector(
+      nextUnlockedPlanetEntry.sector,
+      nextUnlockedPlanetEntry.planet
+    );
+  }, [navigateToSector, nextUnlockedPlanetEntry]);
 
   const selectTarget = (unitId: string) => {
     const unit = enemySquad.find((u) => u.instanceId === unitId);
@@ -1403,6 +1481,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (isFinalWave) {
           setSectorsClearedCount((prev) => prev + 1);
+          if (activePlanet?.id) {
+            setClearedPlanetIds((prev) => ({
+              ...prev,
+              [activePlanet.id]: true,
+            }));
+          }
           pushLog(
             `[VICTORIA DE INCURSIÓN] Oleada 3/3 completada en ${
               activePlanet?.name || 'Sector'
@@ -1538,6 +1622,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         : scaledBaseDamage;
 
     let nextCorrosiveStacks = unit.corrosiveStacks || 0;
+    let nextNeurotoxinTurns = unit.neurotoxinTurns || 0;
     let nextShieldLockTurns = unit.shieldLockTurns || 0;
     let nextIlluminatedTurns = unit.illuminatedTurns || 0;
     let appliedStateTag: string | null = null;
@@ -1548,7 +1633,12 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         GAME_BALANCE.combat.skithidMaxAcidStacks,
         nextCorrosiveStacks + addedStacks
       );
-      appliedStateTag = `ÁCIDO x${nextCorrosiveStacks}`;
+      if (stunTurnsToAdd > 0) {
+        nextNeurotoxinTurns = Math.max(nextNeurotoxinTurns, 2);
+        appliedStateTag = 'NEUROTOXINA';
+      } else {
+        appliedStateTag = `ÁCIDO x${nextCorrosiveStacks}`;
+      }
     } else if (factionId === 'valari' && (isHeavySkill || stunTurnsToAdd > 0)) {
       nextShieldLockTurns = Math.max(
         nextShieldLockTurns,
@@ -1617,6 +1707,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         stunnedTurns: nextStun,
         brokenTurns: nextBroken,
         corrosiveStacks: nextHp > 0 ? nextCorrosiveStacks : 0,
+        neurotoxinTurns: nextHp > 0 ? nextNeurotoxinTurns : 0,
         shieldLockTurns: nextHp > 0 ? nextShieldLockTurns : 0,
         illuminatedTurns: nextHp > 0 ? nextIlluminatedTurns : 0,
         intent: nextIntent,
@@ -1985,7 +2076,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       setActiveActorId(actingEnemy.instanceId);
 
       if (actingEnemy.stunnedTurns > 0) {
-        spawnFloatingEvent(actingEnemy.instanceId, 'SUPRIMIDO', 'control');
+        spawnFloatingEvent(
+          actingEnemy.instanceId,
+          (actingEnemy.neurotoxinTurns || 0) > 0
+            ? 'NEUROTOXINA · SUPRIMIDO'
+            : 'SUPRIMIDO',
+          'control'
+        );
         setEnemySquad((prev) =>
           prev.map((u) =>
             u.instanceId === actingEnemy.instanceId
@@ -1993,6 +2090,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
                   ...u,
                   stunnedTurns: Math.max(0, u.stunnedTurns - 1),
                   brokenTurns: Math.max(0, u.brokenTurns - 1),
+                  neurotoxinTurns: Math.max(0, (u.neurotoxinTurns || 0) - 1),
                   shieldLockTurns: Math.max(0, (u.shieldLockTurns || 0) - 1),
                   illuminatedTurns: Math.max(0, (u.illuminatedTurns || 0) - 1),
                 }
@@ -2166,7 +2264,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
                       activePlanet?.name || 'Sector'
                     }. Evoluciona tus Chasis en la Forja o activa Protocolo Bélico en el Reactor. Retornando al Mando Central.`
                   );
-                  setTimeout(() => {
+                  scheduleCombatTimer(() => {
                     resetCombatEncounter(activePlanet, factionId);
                     setActiveTab('hub');
                   }, 950);
@@ -2215,6 +2313,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
               ...u,
               hp: reflectedHp,
               brokenTurns: Math.max(0, u.brokenTurns - 1),
+              neurotoxinTurns: Math.max(0, (u.neurotoxinTurns || 0) - 1),
               shieldLockTurns: Math.max(0, (u.shieldLockTurns || 0) - 1),
               illuminatedTurns: Math.max(0, (u.illuminatedTurns || 0) - 1),
               intent: nextIntent,
@@ -2283,20 +2382,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const timer = scheduleCombatTimer(() => {
       if (currentWave >= totalWaves) {
-        // Al completar la última oleada (3/3), finaliza el ciclo de incursión y regresamos al Mando Central (Sala de Guerra / Cámara Sináptica / Cámara de Mando)
-        resetCombatEncounter(activePlanet, factionId);
-        setActiveTab('hub');
-        pushLog(
-          `[FIN DE INCURSIÓN] Ciclo de 3 oleadas completado en ${
-            activePlanet?.name || 'Sector'
-          }. Retornando a ${
-            factionId === 'skithid'
-              ? 'la Cámara Sináptica'
-              : factionId === 'cygnus'
-                ? 'la Cámara de Mando'
-                : 'la Sala de Guerra'
-          }.`
-        );
+        // Al completar la última oleada (3/3), mostramos el panel de decisión en el Frente de Batalla (Volver a combatir, Avanzar al siguiente sector o Volver a la Base)
+        isResolvingRef.current = false;
+        setActiveActorId(null);
+        setHitTargetId(null);
+        setTurnPhase('INCURSION_COMPLETE');
         return;
       }
 
@@ -2763,6 +2853,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     const chassisUpgraded = Math.max(0, sumChassisLevels - 5);
     const reactorLvl = buildings[0]?.level || 1;
     const isReactorUpgrading = Boolean(activeBuildingUpgrades['reactor_central']);
+    const totalTechUpgrades = technologies.reduce(
+      (sum, t) => sum + Math.max(0, t.level - 1),
+      0
+    );
+    const isResearchingAny = Object.keys(activeTechResearches).length > 0;
+    const allSlotsMk2Count = [
+      heroLoadout.weapon.level,
+      heroLoadout.chest.level,
+      heroLoadout.helmet.level,
+      heroLoadout.gloves.level,
+      heroLoadout.boots.level,
+    ].filter((lvl) => lvl >= 2).length;
+    const encounteredSpeciesCount = Object.keys(encounteredEnemyKeys).filter(
+      (k) => encounteredEnemyKeys[k]
+    ).length;
+    const clearedPlanetsCount = Object.keys(clearedPlanetIds).filter(
+      (k) => clearedPlanetIds[k]
+    ).length;
 
     return OPERATIONAL_DIRECTIVES_CATALOG.map((d) => {
       let isCompleted = false;
@@ -2776,7 +2884,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       } else if (d.id === 'dir_craft_alloy') {
         isCompleted = craftedItemsCount >= 1;
       } else if (d.id === 'dir_orion_frontier') {
-        isCompleted = orionDeployedCount >= 1 || (activePlanet?.tier || 1) >= 2;
+        isCompleted =
+          (activePlanet?.tier || 1) >= 2 ||
+          clearedPlanetsCount >= 2 ||
+          orionDeployedCount >= 1;
+      } else if (d.id === 'dir_lab_research') {
+        isCompleted = totalTechUpgrades >= 1 || isResearchingAny;
+      } else if (d.id === 'dir_full_mk2_loadout') {
+        isCompleted = allSlotsMk2Count >= 5;
+      } else if (d.id === 'dir_orion_corridor_deploy') {
+        isCompleted =
+          orionDeployedCount >= 1 || Boolean(activePlanet?.id.includes('ORI'));
+      } else if (d.id === 'dir_bestiary_hunter') {
+        isCompleted = encounteredSpeciesCount >= 5;
+      } else if (d.id === 'dir_playtest_mastery') {
+        isCompleted = characterLevel >= 4 && clearedPlanetsCount >= 3;
       }
       return {
         ...d,
@@ -2786,13 +2908,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, [
     activeBuildingUpgrades,
+    activePlanet?.id,
     activePlanet?.tier,
+    activeTechResearches,
     buildings,
+    characterLevel,
     claimedDirectives,
+    clearedPlanetIds,
     craftedItemsCount,
+    encounteredEnemyKeys,
+    heroLoadout,
     orionDeployedCount,
     protocolActivatedCount,
     sumChassisLevels,
+    technologies,
     wavesClearedCount,
   ]);
 
@@ -2835,7 +2964,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     [directives, pushLog]
   );
 
-  // Hitos Operativos Hard Sci-Fi (Logros)
+  // Hitos Operativos Hard Sci-Fi (Recorrido Completo de la Prueba)
   const achievements: HardSciFiAchievement[] = useMemo(() => {
     const chassisUpgraded = Math.max(0, sumChassisLevels - 5);
     const reactorLvl = buildings[0]?.level || 1;
@@ -2845,6 +2974,31 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
       Boolean(activeBuildingUpgrades['reactor_central'])
         ? 1
         : 0;
+    const totalTechUpgrades = technologies.reduce(
+      (sum, t) => sum + Math.max(0, t.level - 1),
+      0
+    );
+    const allSlotsMk2Count = [
+      heroLoadout.weapon.level,
+      heroLoadout.chest.level,
+      heroLoadout.helmet.level,
+      heroLoadout.gloves.level,
+      heroLoadout.boots.level,
+    ].filter((lvl) => lvl >= 2).length;
+    const encounteredSpeciesCount = Object.keys(encounteredEnemyKeys).filter(
+      (k) => encounteredEnemyKeys[k]
+    ).length;
+    const clearedPlanetsCount = Object.keys(clearedPlanetIds).filter(
+      (k) => clearedPlanetIds[k]
+    ).length;
+
+    const coreMilestonesMet = [
+      sectorsClearedCount >= 1,
+      allSlotsMk2Count >= 5,
+      orionDeployedCount >= 1,
+      encounteredSpeciesCount >= 5,
+      characterLevel >= 4,
+    ].filter(Boolean).length;
 
     return [
       {
@@ -2861,7 +3015,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         id: 'ach_sector_clear',
         code: 'REC-02',
         title: 'Supremacía Planetaria',
-        description: 'Asegura una incursión completa de 3/3 oleadas en cualquier órbita.',
+        description: 'Completa una incursión entera (Oleada 3/3) en cualquier órbita.',
         progress: Math.min(1, sectorsClearedCount),
         target: 1,
         unlocked: sectorsClearedCount >= 1,
@@ -2871,7 +3025,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         id: 'ach_mk2_chassis',
         code: 'REC-03',
         title: 'Ingeniería Grado II',
-        description: 'Evoluciona al menos una pieza de tu Chasis a Grado Mk-II en la Forja.',
+        description: 'Evoluciona al menos una pieza de tu Equipamiento a Grado Mk-II.',
         progress: Math.min(1, chassisUpgraded),
         target: 1,
         unlocked: chassisUpgraded >= 1,
@@ -2888,34 +3042,79 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
         categoryLabel: 'ENERGÍA',
       },
       {
-        id: 'ach_orion_corridor',
+        id: 'ach_industrial_research',
         code: 'REC-05',
-        title: 'Vanguardia de Orión',
-        description: 'Despliega en el Corredor de Orión (Sector en Disputa Tiers IV–V).',
-        progress: Math.min(1, orionDeployedCount),
-        target: 1,
-        unlocked: orionDeployedCount >= 1,
+        title: 'Complejo Científico-Industrial',
+        description: 'Sintetiza compuestos en la Forja e investiga mejoras en el Laboratorio.',
+        progress: Math.min(2, craftedItemsCount + totalTechUpgrades),
+        target: 2,
+        unlocked: craftedItemsCount + totalTechUpgrades >= 2,
+        categoryLabel: 'DESARROLLO',
+      },
+      {
+        id: 'ach_full_mk2_suit',
+        code: 'REC-06',
+        title: 'Equipamiento Sincronizado Mk-II',
+        description: 'Evoluciona las 5 piezas de tu Héroe (Arma, Coraza, Casco, Guantes, Botas) a Mk-II.',
+        progress: Math.min(5, allSlotsMk2Count),
+        target: 5,
+        unlocked: allSlotsMk2Count >= 5,
+        categoryLabel: 'EQUIPAMIENTO',
+      },
+      {
+        id: 'ach_orion_corridor',
+        code: 'REC-07',
+        title: 'Explorador de Sectores (Tiers I–V)',
+        description: 'Asegura incursiones completas (3/3) en distintos planetas del Sector Natal y Orión.',
+        progress: Math.min(8, Math.max(clearedPlanetsCount, orionDeployedCount > 0 ? 2 : 0)),
+        target: 8,
+        unlocked: clearedPlanetsCount >= 8,
         categoryLabel: 'CARTOGRAFÍA',
       },
       {
+        id: 'ach_bestiary_codex',
+        code: 'REC-08',
+        title: 'Códice de Hostiles y Amenazas Raras',
+        description: 'Enfrenta y registra las 8 especies hostiles disponibles en la prueba (incluyendo Élites).',
+        progress: Math.min(8, encounteredSpeciesCount),
+        target: 8,
+        unlocked: encounteredSpeciesCount >= 8,
+        categoryLabel: 'INTELIGENCIA',
+      },
+      {
         id: 'ach_master_commander',
-        code: 'REC-06',
-        title: 'Comandante Soberano',
-        description: 'Alcanza el Nivel 10 de Héroe mediante mejoras de Chasis y victorias.',
-        progress: Math.min(10, characterLevel),
-        target: 10,
-        unlocked: characterLevel >= 10,
+        code: 'REC-09',
+        title: 'Veteranía de Combate',
+        description: 'Alcanza el Nivel 5 de Héroe mediante victorias tácticas y evolución de equipamiento.',
+        progress: Math.min(5, characterLevel),
+        target: 5,
+        unlocked: characterLevel >= 5,
         categoryLabel: 'RANGO',
+      },
+      {
+        id: 'ach_playtest_complete',
+        code: 'REC-10',
+        title: 'Fin del Recorrido de la Prueba',
+        description: 'Completa los 5 hitos troncales de la demo: Incursión 3/3, 5 piezas Mk-II+, Salto a Orión, 5+ Hostiles y Héroe Nv. 4+.',
+        progress: coreMilestonesMet,
+        target: 5,
+        unlocked: coreMilestonesMet >= 5,
+        categoryLabel: 'HITO FINAL',
       },
     ];
   }, [
     activeBuildingUpgrades,
     buildings,
     characterLevel,
+    clearedPlanetIds,
+    craftedItemsCount,
+    encounteredEnemyKeys,
+    heroLoadout,
     orionDeployedCount,
     protocolActivatedCount,
     sectorsClearedCount,
     sumChassisLevels,
+    technologies,
     wavesClearedCount,
   ]);
 
@@ -2925,6 +3124,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch {
       // ignore
     }
+    setPlayerNameState('Comandante');
     setCredits(MOCK_CREDITS);
     setInventory(MOCK_INVENTORY);
     setBuildings(INITIAL_CITADEL_BUILDINGS);
@@ -2949,12 +3149,18 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     setCompletedDirectiveToast(null);
     setCombatSessionLoot({ credits: 0, wavesCleared: 0, items: [] });
     setEncounteredEnemyKeys({});
+    setClearedPlanetIds({});
     setVisitedTutorialScreens({});
     setTutorialsEnabled(true);
     setTutorialStepIndex(0);
+    setIsAutoCombat(false);
+    setCombatSpeed(1);
+    setActiveTab('hub');
     resetCombatEncounter(activePlanet, factionId);
     setIsSelectingFaction(true);
-    pushLog('[SISTEMA] Progreso de partida reiniciado a valores iniciales (Nivel 1, 0 recursos).');
+    setActivityFeed([
+      '[SISTEMA] Progreso de partida reiniciado por completo a estado virgen (Nivel 1, 0 recursos, 0 hostiles identificados).',
+    ]);
   };
 
   const toggleCombat = () => {
@@ -3021,6 +3227,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
     openForgeTab,
     combatSessionLoot,
     clearCombatSessionLoot,
+    restartCurrentIncursion,
+    advanceToNextPlanetIncursion,
+    nextUnlockedPlanetName,
     encounteredEnemyKeys,
     selectedEnemy: DEFAULT_PREVIEW_ENEMY,
     enemySquad,

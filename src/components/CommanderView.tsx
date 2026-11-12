@@ -110,9 +110,9 @@ const FACTION_LIMITERS: Record<FactionId, FactionLimiterConfig> = {
     lineActiveColor: '#FBBF24',
     glowColor: 'rgba(245, 158, 11, 0.45)',
     highlightCardClass:
-      'border-amber-400/85 ring-1 ring-amber-400/45 shadow-[0_0_22px_rgba(245,158,11,0.28)] bg-[#1A202C]/90 -translate-y-0.5',
+      'border-amber-400/90 ring-1 ring-amber-400/50 shadow-[0_0_24px_rgba(245,158,11,0.32)] bg-amber-950/40 -translate-y-0.5',
     pinnedCardClass:
-      'border-amber-400/65 ring-1 ring-amber-400/30 shadow-[0_0_16px_rgba(245,158,11,0.2)] bg-[#182232]/85',
+      'border-amber-400/75 ring-1 ring-amber-400/35 shadow-[0_0_18px_rgba(245,158,11,0.24)] bg-amber-950/30',
   },
   skithid: {
     label: 'TENSIÓN SINÁPTICA',
@@ -124,9 +124,9 @@ const FACTION_LIMITERS: Record<FactionId, FactionLimiterConfig> = {
     lineActiveColor: '#34D399',
     glowColor: 'rgba(16, 185, 129, 0.45)',
     highlightCardClass:
-      'border-emerald-400/85 ring-1 ring-emerald-400/45 shadow-[0_0_22px_rgba(16,185,129,0.28)] bg-[#152424]/90 -translate-y-0.5',
+      'border-emerald-400/90 ring-1 ring-emerald-400/50 shadow-[0_0_24px_rgba(16,185,129,0.32)] bg-emerald-950/40 -translate-y-0.5',
     pinnedCardClass:
-      'border-emerald-400/65 ring-1 ring-emerald-400/30 shadow-[0_0_16px_rgba(16,185,129,0.2)] bg-[#182232]/85',
+      'border-emerald-400/75 ring-1 ring-emerald-400/35 shadow-[0_0_18px_rgba(16,185,129,0.24)] bg-emerald-950/30',
   },
   cygnus: {
     label: 'COHERENCIA DE FASE',
@@ -138,9 +138,9 @@ const FACTION_LIMITERS: Record<FactionId, FactionLimiterConfig> = {
     lineActiveColor: '#60A5FA',
     glowColor: 'rgba(59, 130, 246, 0.45)',
     highlightCardClass:
-      'border-sky-400/85 ring-1 ring-sky-400/45 shadow-[0_0_22px_rgba(56,189,248,0.28)] bg-[#152236]/90 -translate-y-0.5',
+      'border-sky-400/90 ring-1 ring-sky-400/50 shadow-[0_0_24px_rgba(56,189,248,0.32)] bg-sky-950/40 -translate-y-0.5',
     pinnedCardClass:
-      'border-sky-400/65 ring-1 ring-sky-400/30 shadow-[0_0_16px_rgba(56,189,248,0.2)] bg-[#182232]/85',
+      'border-sky-400/75 ring-1 ring-sky-400/35 shadow-[0_0_18px_rgba(56,189,248,0.24)] bg-sky-950/30',
   },
 };
 
@@ -380,22 +380,60 @@ function getPrimaryStatInfo(item: HeroChassisItem): { label: string; value: stri
   return { label: 'ESCUDO', value: `+${value}` };
 }
 
-// Atributo secundario útil por ranura en vez de repetir "CATEGORÍA: Tier I"
-function getSecondaryStatInfo(item: HeroChassisItem): { label: string; value: string } {
+// Atributo secundario útil por ranura con explicación de su bono táctico
+function getSecondaryStatInfo(item: HeroChassisItem): {
+  label: string;
+  value: string;
+  benefitHint: string;
+} {
   if (item.secondaryStat) {
     const { type, value } = item.secondaryStat;
-    if (type === 'critChance') return { label: 'CRÍTICO', value: `+${value}%` };
-    if (type === 'accuracy') return { label: 'PRECISIÓN', value: `+${value}%` };
-    if (type === 'reconLuck') return { label: 'SUERTE', value: `+${value}%` };
-    return { label: 'CADENCIA', value: `+${value}%` };
+    if (type === 'critChance') {
+      return {
+        label: 'CRÍTICO',
+        value: `+${value}%`,
+        benefitHint: 'Probabilidad de impacto crítico (+55% daño en Ruptura)',
+      };
+    }
+    if (type === 'accuracy') {
+      return {
+        label: 'PRECISIÓN',
+        value: `+${value}%`,
+        benefitHint: 'Contrarresta la Evasión enemiga y potencia el Ataque',
+      };
+    }
+    if (type === 'reconLuck') {
+      return {
+        label: 'SUERTE',
+        value: `+${value}%`,
+        benefitHint: 'Aumenta hallazgo de botín y aparición de Élite Raro',
+      };
+    }
+    return {
+      label: 'CADENCIA',
+      value: `+${value}%`,
+      benefitHint: 'Incrementa el multiplicador de daño por ciclo de arma',
+    };
   }
   if (item.slot === 'chest') {
-    return { label: 'INTEGRIDAD', value: `+${item.tier * 45} HP` };
+    return {
+      label: 'INTEGRIDAD',
+      value: `+${item.tier * 45} HP`,
+      benefitHint: 'Refuerza la Salud estructural máxima del Comandante',
+    };
   }
   if (item.slot === 'gloves') {
-    return { label: 'CADENCIA', value: `+${item.tier * 4}%` };
+    return {
+      label: 'PRECISIÓN',
+      value: `+${item.tier * 4}%`,
+      benefitHint: 'Contrarresta la Evasión enemiga y suma daño directo',
+    };
   }
-  return { label: 'ESTABILIDAD', value: `+${item.tier * 6}%` };
+  return {
+    label: 'ESTABILIDAD',
+    value: `+${item.tier * 6}%`,
+    benefitHint: `+${item.level * 3} SPD de Iniciativa en Cola de Turnos`,
+  };
 }
 
 function renderSlotIcon(slot: HeroChassisSlot, accentClass: string) {
@@ -441,12 +479,13 @@ const BlueprintChassisCard: React.FC<BlueprintChassisCardProps> = ({
       onClick={() => onSelect(item.slot)}
       onMouseEnter={() => onHover(item.slot)}
       onMouseLeave={() => onHover(null)}
-      className={`relative h-[188px] bg-[#121926]/72 backdrop-blur-xl border rounded-2xl p-5 flex flex-col justify-between shadow-lg transition-all duration-200 select-none cursor-pointer ${
+      title={`${secondary.label} (${secondary.value}): ${secondary.benefitHint}`}
+      className={`relative h-[188px] backdrop-blur-xl border rounded-2xl p-5 flex flex-col justify-between shadow-lg transition-all duration-200 select-none cursor-pointer ${
         isHighlighted
           ? highlightCardClass
           : isPinned
             ? pinnedCardClass
-            : 'border-slate-300/[0.12] hover:border-slate-300/25'
+            : 'bg-[#121926]/72 border-slate-300/[0.12] hover:border-slate-300/25'
       }`}
     >
       {beaconNode && (
@@ -483,7 +522,10 @@ const BlueprintChassisCard: React.FC<BlueprintChassisCardProps> = ({
             {primary.value}
           </span>
         </div>
-        <div className="rounded-xl bg-[#182232]/58 border border-slate-300/[0.09] px-3.5 py-2.5 flex flex-col justify-center">
+        <div
+          title={secondary.benefitHint}
+          className="rounded-xl bg-[#182232]/58 border border-slate-300/[0.09] px-3.5 py-2.5 flex flex-col justify-center"
+        >
           <span className="text-xs font-bold uppercase tracking-wider text-slate-300 leading-none">
             {secondary.label}
           </span>
@@ -493,12 +535,12 @@ const BlueprintChassisCard: React.FC<BlueprintChassisCardProps> = ({
         </div>
       </div>
 
-      <div className="pt-2.5 border-t border-slate-300/[0.10] flex items-center justify-between text-[13px] font-mono text-slate-300 tabular-nums">
-        <span>
+      <div className="pt-2.5 border-t border-slate-300/[0.10] flex items-center justify-between gap-2 text-xs font-mono text-slate-300 tabular-nums">
+        <span className="shrink-0">
           Carga: <strong className="text-slate-100 font-bold">{item.powerDrawMw} {unit}</strong>
         </span>
-        <span className="text-slate-300 font-semibold tracking-wider">
-          TIER {ROMAN_TIERS[item.tier] || item.tier}
+        <span className="text-[11px] text-slate-400 truncate" title={secondary.benefitHint}>
+          {secondary.benefitHint}
         </span>
       </div>
     </div>
@@ -738,84 +780,105 @@ export const CommanderView: React.FC<CommanderViewProps> = ({
 
   return (
     <section className="w-full flex flex-col gap-4 select-none">
-      {/* 1. STATUS BAR SUPERIOR */}
-      <div className={`px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0 ${GLOBAL_UI.glass.panel}`}>
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="relative flex h-3 w-3 shrink-0">
-            <span
-              className={`animate-ping absolute inline-flex h-full w-full rounded-full ${limiter.bar} opacity-75`}
-            />
-            <span className={`relative inline-flex rounded-full h-3 w-3 ${limiter.bar}`} />
-          </span>
+      {/* 1. CABECERA UNIFICADA DE HÉROE Y EQUIPAMIENTO */}
+      <header
+        className={`p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 shrink-0 ${GLOBAL_UI.glass.panel}`}
+      >
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div
+            className={`w-12 h-12 rounded-xl bg-[#182232]/85 border ${factionTheme.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
+          >
+            <Shield className={`w-6 h-6 ${factionTheme.accentText}`} />
+          </div>
 
-          {isEditingName ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-mono font-bold text-slate-300 uppercase">
-                EXPEDIENTE TÁCTICO //
-              </span>
-              <input
-                type="text"
-                value={nameDraft}
-                maxLength={22}
-                autoFocus
-                onChange={(e) => setNameDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveName();
-                  if (e.key === 'Escape') {
+          <div className="flex flex-col min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-lg sm:text-xl font-display font-bold text-slate-200 uppercase">
+                    HÉROE Y EQUIPAMIENTO ·
+                  </span>
+                  <input
+                    type="text"
+                    value={nameDraft}
+                    maxLength={22}
+                    autoFocus
+                    onChange={(e) => setNameDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveName();
+                      if (e.key === 'Escape') {
+                        setNameDraft(playerName);
+                        setIsEditingName(false);
+                      }
+                    }}
+                    onBlur={handleSaveName}
+                    className="w-44 px-2.5 py-1 rounded-lg bg-[#090d14] border border-white/25 text-sm font-display font-bold text-white focus:outline-none focus:border-emerald-400"
+                  />
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSaveName();
+                    }}
+                    className="p-1.5 rounded-lg bg-emerald-950/80 border border-emerald-400/50 text-emerald-300 hover:text-white cursor-pointer"
+                    title="Guardar nombre de Comandante"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
                     setNameDraft(playerName);
-                    setIsEditingName(false);
-                  }
-                }}
-                onBlur={handleSaveName}
-                className="w-44 px-2.5 py-1 rounded-lg bg-[#090d14] border border-white/25 text-sm font-display font-bold text-white focus:outline-none focus:border-emerald-400"
-              />
-              <button
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSaveName();
-                }}
-                className="p-1.5 rounded-lg bg-emerald-950/80 border border-emerald-400/50 text-emerald-300 hover:text-white cursor-pointer"
-                title="Guardar nombre de Comandante"
+                    setIsEditingName(true);
+                  }}
+                  title="Haz clic para personalizar tu nombre de Comandante"
+                  className="group flex items-center gap-2 text-left cursor-pointer"
+                >
+                  <h1 className="text-xl sm:text-2xl font-display font-bold tracking-wide text-slate-100 group-hover:text-white uppercase">
+                    HÉROE Y EQUIPAMIENTO · {playerName}
+                  </h1>
+                  <Pencil className="w-3.5 h-3.5 text-slate-400 opacity-65 group-hover:opacity-100 group-hover:text-white transition-opacity shrink-0" />
+                </button>
+              )}
+
+              <span
+                className={`px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-bold uppercase tabular-nums ${limiter.accent}`}
               >
-                <Check className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setNameDraft(playerName);
-                setIsEditingName(true);
-              }}
-              title="Haz clic para personalizar tu nombre de Comandante"
-              className="group flex items-center gap-2 text-left cursor-pointer"
-            >
-              <span className="text-sm md:text-base font-mono font-bold tracking-wider text-slate-100 group-hover:text-white uppercase">
-                EXPEDIENTE TÁCTICO // {playerName}
+                Nv. {characterLevel}
               </span>
-              <Pencil className="w-3.5 h-3.5 text-slate-400 opacity-65 group-hover:opacity-100 group-hover:text-white transition-opacity shrink-0" />
-            </button>
-          )}
+            </div>
+
+            <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
+              Inspecciona las piezas activas de tu chasis y el balance de atributos de combate.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div
+            className={`min-h-[42px] px-3.5 py-2 rounded-xl font-mono flex flex-col justify-center items-end ${GLOBAL_UI.glass.subcard}`}
+          >
+            <span className="text-[11px] uppercase tracking-wider text-slate-400 leading-none">
+              Rango de Combate
+            </span>
+            <span className={`text-sm font-bold tabular-nums mt-0.5 leading-none ${limiter.accent}`}>
+              Nivel {characterLevel}
+            </span>
+          </div>
+
           {onOpenForge && (
             <button
               type="button"
               onClick={onOpenForge}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold uppercase tracking-wider transition-colors cursor-pointer ${factionTheme.primaryButton}`}
+              className={`min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider shrink-0 flex items-center justify-center gap-2 transition-colors cursor-pointer ${factionTheme.primaryButton}`}
             >
-              Evolucionar Equipamiento en Forja →
+              <span>Evolucionar en Forja →</span>
             </button>
           )}
-          <span
-            className={`px-4 py-1.5 rounded-xl bg-black/45 border border-white/10 text-xs sm:text-sm font-bold font-mono tracking-wider uppercase tabular-nums ${limiter.accent}`}
-          >
-            RANGO DE COMBATE NV. {characterLevel}
-          </span>
         </div>
-      </div>
+      </header>
 
       {/* 2. PANEL RECTANGULAR PRINCIPAL */}
       <div className={`relative w-full p-6 lg:p-7 overflow-x-auto ${GLOBAL_UI.glass.panel}`}>

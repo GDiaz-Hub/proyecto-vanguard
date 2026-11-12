@@ -65,62 +65,55 @@ export const DirectivesView: React.FC<DirectivesViewProps> = ({
       aria-label={menuLabels.directivesLabel}
       className="w-full flex flex-col gap-5 text-slate-200 select-none animate-in fade-in duration-300"
     >
-      {/* CABECERA DE DIRECTIVAS E HITOS */}
+      {/* CABECERA UNIFICADA DE DIRECTIVAS E HITOS */}
       <header
-        className={`p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
+        className={`w-full p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
       >
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-center gap-3.5 min-w-0">
           <div
             className={`w-12 h-12 rounded-xl bg-[#182232]/80 border ${theme.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
           >
             {renderFactionIcon(`w-6 h-6 ${theme.accentText}`)}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-300">
-              Misiones Guiadas y Telemetría de Progreso
-            </span>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
-              {menuLabels.directivesLabel}
-            </h1>
-            <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
-              Completa encargos prioritarios para financiar la Ciudadela con
-              Créditos (₡) y registra tus hitos tácticos de mando.
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide leading-tight">
+                {menuLabels.directivesLabel}
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-200">
+                Recorrido Guiado de Prueba
+              </span>
+            </div>
+            <p className="text-[13px] sm:text-sm text-slate-300 mt-1 leading-snug">
+              Completa objetivos operativos para obtener Créditos (₡) y registrar tus hitos de mando.
             </p>
           </div>
         </div>
 
-        {/* TELEMETRÍA RESUMEN */}
-        <div className="flex flex-wrap items-center gap-3">
+        {/* TELEMETRÍA Y ACCIÓN ESTANDARIZADA (MISMA ALTURA 42PX QUE INSTALACIONES) */}
+        <div className="flex flex-wrap items-center gap-2.5 xl:justify-end shrink-0">
           {readyToClaimCount > 0 && (
-            <div className="px-4 py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-400/50 flex flex-col items-end font-mono shadow-[0_0_16px_rgba(16,185,129,0.2)]">
-              <span className="text-xs uppercase tracking-wider text-emerald-200 font-bold">
-                Recompensas Listas
-              </span>
-              <span className="text-base font-bold text-white tabular-nums">
-                {readyToClaimCount}{' '}
-                {readyToClaimCount === 1 ? 'Directiva' : 'Directivas'}
+            <div className="min-h-[42px] px-3.5 py-2 rounded-xl bg-emerald-950/60 border border-emerald-400/55 font-mono text-[13px] flex items-center gap-2 shadow-[0_0_16px_rgba(16,185,129,0.2)] tabular-nums">
+              <Coins className="w-4 h-4 text-amber-300 shrink-0" />
+              <span className="text-emerald-200">Listas:</span>
+              <span className="font-bold text-white">
+                {readyToClaimCount}
               </span>
             </div>
           )}
 
-          <div
-            className={`px-4 py-2.5 flex flex-col items-end font-mono ${GLOBAL_UI.glass.subcard}`}
-          >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
-              Directivas Completadas
-            </span>
-            <span className="text-base font-bold text-slate-100 tabular-nums">
+          <div className="min-h-[42px] px-3.5 py-2 rounded-xl bg-black/45 border border-white/12 font-mono text-[13px] flex items-center gap-2 tabular-nums">
+            <Target className={`w-4 h-4 shrink-0 ${theme.accentText}`} />
+            <span className="text-slate-300">Directivas:</span>
+            <span className="font-bold text-white">
               {completedDirectivesCount} / {directives.length}
             </span>
           </div>
 
-          <div
-            className={`px-4 py-2.5 flex flex-col items-end font-mono ${GLOBAL_UI.glass.subcard}`}
-          >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
-              Hitos Registrados
-            </span>
-            <span className="text-base font-bold text-slate-100 tabular-nums">
+          <div className="min-h-[42px] px-3.5 py-2 rounded-xl bg-black/45 border border-white/12 font-mono text-[13px] flex items-center gap-2 tabular-nums">
+            <Award className={`w-4 h-4 shrink-0 ${theme.accentText}`} />
+            <span className="text-slate-300">Hitos:</span>
+            <span className="font-bold text-white">
               {unlockedAchievementsCount} / {achievements.length}
             </span>
           </div>

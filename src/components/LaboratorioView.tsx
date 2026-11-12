@@ -105,7 +105,7 @@ const FACTION_LAB_IDENTITIES: Record<FactionId, FactionLabIdentity> = {
     headerBadge: 'DIVISIÓN CIENTÍFICA BALÍSTICA',
     labName: 'Laboratorio Balístico I+D',
     labSubtitle:
-      'Optimización metalúrgica, compresión volumétrica de silos y redes de potencia pesada.',
+      'Investiga mejoras permanentes de capacidad, síntesis, equipamiento y energía.',
     techOverrides: {
       tech_eficiencia_logistica: {
         title: 'Compresión Volumétrica',
@@ -150,7 +150,7 @@ const FACTION_LAB_IDENTITIES: Record<FactionId, FactionLabIdentity> = {
     headerBadge: 'CÁMARA DE BIOLOGÍA EVOLUTIVA',
     labName: 'Cámara de Génesis Evolutiva',
     labSubtitle:
-      'Mutación sináptica, catálisis enzimática acelerada y expansión de tejidos de biomasa.',
+      'Investiga mutaciones permanentes de capacidad, síntesis, equipamiento y energía.',
     techOverrides: {
       tech_eficiencia_logistica: {
         title: 'Densidad de Biomasa',
@@ -195,7 +195,7 @@ const FACTION_LAB_IDENTITIES: Record<FactionId, FactionLabIdentity> = {
     headerBadge: 'NÚCLEO DE COMPILACIÓN CUÁNTICA',
     labName: 'Nexo de Algoritmos Cuánticos',
     labSubtitle:
-      'Simulación cuántica, calibración fotónica y superconductores de punto cero.',
+      'Investiga algoritmos permanentes de capacidad, síntesis, equipamiento y energía.',
     techOverrides: {
       tech_eficiencia_logistica: {
         title: 'Compresión Sub-Espacial',
@@ -642,12 +642,19 @@ export const LaboratorioView: React.FC<LaboratorioViewProps> = ({
                 ) : !meetsLabRequirement ? (
                   <>
                     <Lock className="w-4 h-4 shrink-0" />
-                    <span>Requiere Laboratorio Nivel {requiredLab}</span>
+                    <span>
+                      Requiere {identity.labName} Nivel {requiredLab}
+                    </span>
                   </>
-                ) : !hasAllResources ? (
+                ) : !hasFerrita || !hasTitanio ? (
                   <>
                     <Lock className="w-4 h-4 shrink-0" />
-                    <span>Recursos Insuficientes</span>
+                    <span>Materiales Insuficientes</span>
+                  </>
+                ) : !hasCredits ? (
+                  <>
+                    <Lock className="w-4 h-4 shrink-0" />
+                    <span>Créditos Insuficientes</span>
                   </>
                 ) : (
                   <>

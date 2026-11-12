@@ -234,3 +234,96 @@ html {
 .animate-beacon-pulse {
   animation: beaconPulse 1.8s ease-in-out infinite;
 }
+
+@keyframes skithidSynapticEvade {
+  0% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  16% {
+    transform: translateX(-5px);
+    opacity: 0.52;
+  }
+  34% {
+    transform: translateX(5px);
+    opacity: 0.9;
+  }
+  52% {
+    transform: translateX(-4px);
+    opacity: 0.48;
+  }
+  70% {
+    transform: translateX(4px);
+    opacity: 0.88;
+  }
+  86% {
+    transform: translateX(-2px);
+    opacity: 0.64;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+.animate-skithid-synaptic-evade {
+  animation: skithidSynapticEvade 0.62s ease-in-out infinite;
+}
+
+@keyframes neurotoxinMarkPulse {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.animate-neurotoxin-pulse {
+  animation: neurotoxinMarkPulse 1.45s ease-in-out infinite;
+}
+
+@keyframes cygnusPhaseResist {
+  0%, 100% {
+    transform: translateX(0px);
+  }
+  15% {
+    transform: translateX(-2.5px);
+  }
+  30% {
+    transform: translateX(2.5px);
+  }
+  45% {
+    transform: translateX(-2px);
+  }
+  60% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-1.5px);
+  }
+  90% {
+    transform: translateX(1.5px);
+  }
+}
+
+.animate-cygnus-phase-resist {
+  animation: cygnusPhaseResist 0.42s ease-in-out infinite;
+}
+
+@keyframes cygnusTargetLockPulse {
+  0%, 100% {
+    opacity: 0.84;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.animate-cygnus-target-lock {
+  animation: cygnusTargetLockPulse 1.6s ease-in-out infinite;
+}

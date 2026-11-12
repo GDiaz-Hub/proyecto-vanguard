@@ -366,6 +366,8 @@ export interface CombatSquadUnit {
   brokenTurns: number;
   /** Cargas de Ácido Quirúrgico Skithid (0..3 -> cada carga filtra 6% de daño directo a HP ignorando blindaje) */
   corrosiveStacks?: number;
+  /** Turnos restantes de Neurotoxina Skithid (marca visual y exposición neurotóxica activa sobre el enemigo) */
+  neurotoxinTurns?: number;
   /** Turnos de Sobrecarga Cinética Valari (impide recargar escudos/defensa) */
   shieldLockTurns?: number;
   /** Turnos de Marcado Lumínico Cygnus (reduce evasión a la mitad y recibe +10% daño de precisión) */
@@ -400,7 +402,7 @@ export interface CombatTurnQueueItem {
   intent?: EnemyIntentType;
 }
 
-export type CombatTurnPhase = 'PLAYER_TURN' | 'ENEMY_TURN' | 'WAVE_TRANSITION';
+export type CombatTurnPhase = 'PLAYER_TURN' | 'ENEMY_TURN' | 'WAVE_TRANSITION' | 'INCURSION_COMPLETE';
 
 export interface CombatFloatingEvent {
   id: string;

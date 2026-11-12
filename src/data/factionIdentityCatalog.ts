@@ -311,7 +311,7 @@ export const FACTION_REACTOR_SKINS: Record<FactionId, FactionReactorSkinConfig> 
     headerBadge: 'BASTIÓN DE HIERRO · LEGIÓN VALARI',
     reactorTitle: 'Horno Termonuclear',
     reactorSubtitle:
-      'Cámara acorazada de titanio y grafito laminado con pistones hidráulicos y escape térmico ámbar.',
+      'Genera energía (MW) para alimentar tus instalaciones, protocolos y equipamiento.',
     factionPassiveTitle: 'Doctrina Valari · Ingeniería de Bastión',
     factionPassiveDesc:
       '-15% Coste de materiales al ampliar el Bastión de Hierro y +25% Créditos al desguazar en el Silo.',
@@ -342,7 +342,7 @@ export const FACTION_REACTOR_SKINS: Record<FactionId, FactionReactorSkinConfig> 
     headerBadge: 'EL ENJAMBRE · ÓRGANO DE RESONANCIA SKITHID',
     reactorTitle: 'Corazón Sináptico',
     reactorSubtitle:
-      'Órgano central de resonancia metabólica recubierto en placas facetadas de quitina blanco marfil.',
+      'Genera energía bio-eléctrica (MW) para tus instalaciones, protocolos y equipamiento.',
     factionPassiveTitle: 'Doctrina Skithid · Simbiosis Metabólica',
     factionPassiveDesc:
       '-12% Consumo de MW en el Equipamiento del Héroe y +25% velocidad de síntesis en la Biocámara Mutante.',
@@ -373,7 +373,7 @@ export const FACTION_REACTOR_SKINS: Record<FactionId, FactionReactorSkinConfig> 
     headerBadge: 'EL NEXO · SINGULARIDAD ARMÓNICA CYGNUS',
     reactorTitle: 'Matriz Punto Cero',
     reactorSubtitle:
-      'Colimador poliédrico de cromo suspendido por gravedad con anillos superconductores en azul eléctrico.',
+      'Genera energía cuántica (MW) para alimentar tus instalaciones, protocolos y equipamiento.',
     factionPassiveTitle: 'Doctrina Cygnus · Flujo Cuántico',
     factionPassiveDesc:
       '+15% Capacidad total de MW generada por nivel del Reactor y 25% probabilidad de conservar insumos en Compilador.',
@@ -473,13 +473,36 @@ export const CHASSIS_ROMAN_NUMERALS: Record<number, string> = {
 };
 
 /**
- * 8. CATÁLOGO DE UNIDADES ENEMIGAS CANÓNICAS Y NEUTRALES DE LA ARENA
+ * 8. CATÁLOGO DE RETRATOS DE DASHBOARD (600x720 .jpg), RETRATOS DE TURNOS (128x128 .jpg) Y SPRITES DE ARENA
  */
-export const HERO_PORTRAITS_CATALOG: Record<FactionId, string> = {
-  valari: '/assets/unidades/hero-cb-valari.png',
-  skithid: '/assets/unidades/hero-cb-skithid.png',
-  cygnus: '/assets/unidades/hero-cb-cygnus.png',
+export const HERO_DASHBOARD_PORTRAITS_CATALOG: Record<FactionId, string> = {
+  valari: '/assets/retratos-dashboard/hero-dashboard-valari.jpg',
+  skithid: '/assets/retratos-dashboard/hero-dashboard-skithid.jpg',
+  cygnus: '/assets/retratos-dashboard/hero-dashboard-cygnus.jpg',
 };
+
+export const HERO_PORTRAITS_CATALOG: Record<FactionId, string> = {
+  valari: '/assets/turnos/hero-valari.jpg',
+  skithid: '/assets/turnos/hero-skithid.jpg',
+  cygnus: '/assets/turnos/hero-cygnus.jpg',
+};
+
+/**
+ * Convierte cualquier ruta de sprite de combate (`/assets/unidades/<archivo>.png`)
+ * a su versión separada de 128x128 px en formato .jpg para la Secuencia de Turnos (`/assets/turnos/<archivo>.jpg`).
+ */
+export function getTurnPortraitForSpriteUrl(spriteUrl?: string): string {
+  if (!spriteUrl) return '/assets/turnos/hero-valari.jpg';
+  if (spriteUrl.includes('/assets/turnos/')) {
+    return spriteUrl
+      .replace('hero-cb-', 'hero-')
+      .replace(/\.png$/i, '.jpg');
+  }
+  return spriteUrl
+    .replace('/assets/unidades/', '/assets/turnos/')
+    .replace('hero-cb-', 'hero-')
+    .replace(/\.png$/i, '.jpg');
+}
 
 export const UNIT_SPRITES_CATALOG: Record<string, string> = {
   // Sprites canónicos y de respaldo por facción
@@ -1306,7 +1329,7 @@ export function getPlanetHostilesRoster(
 
     const spriteUrl =
       UNIT_SPRITES_CATALOG[spec.spriteKey] ||
-      HERO_PORTRAITS_CATALOG[spec.factionStyle];
+      `/assets/unidades/hero-cb-${spec.factionStyle}.png`;
 
     return {
       unitKey: `${planetId}__${spec.name}`,
@@ -2473,7 +2496,7 @@ export const OPERATIONAL_DIRECTIVES_CATALOG: DirectiveTemplate[] = [
       'Despliega en tu mundo inicial de Tier I y neutraliza al menos 1 oleada hostil para extraer tus primeros materiales y créditos.',
     targetTab: 'combate',
     actionLabel: 'Ir al Frente de Batalla',
-    rewardCredits: 65,
+    rewardCredits: 80,
   },
   {
     id: 'dir_upgrade_chassis',
@@ -2483,7 +2506,7 @@ export const OPERATIONAL_DIRECTIVES_CATALOG: DirectiveTemplate[] = [
       'Usa los materiales recolectados en la Forja para subir de nivel tu Arma o Coraza.',
     targetTab: 'ciudadela_forja',
     actionLabel: 'Abrir Forja de Equipamiento',
-    rewardCredits: 85,
+    rewardCredits: 110,
   },
   {
     id: 'dir_reactor_protocol',
@@ -2493,7 +2516,7 @@ export const OPERATIONAL_DIRECTIVES_CATALOG: DirectiveTemplate[] = [
       'Libera MW con el Regulador de Equipamiento para encender un Protocolo (Industrial, Orbital o Bélico) o amplía el Reactor.',
     targetTab: 'ciudadela_reactor',
     actionLabel: 'Inspeccionar Reactor',
-    rewardCredits: 95,
+    rewardCredits: 130,
   },
   {
     id: 'dir_craft_alloy',
@@ -2503,16 +2526,67 @@ export const OPERATIONAL_DIRECTIVES_CATALOG: DirectiveTemplate[] = [
       'Refina tus recursos brutos en Aleación Balística, Enzima Corrosiva o Cristal de Cromo para desbloquear evoluciones superiores.',
     targetTab: 'ciudadela_forja',
     actionLabel: 'Sintetizar Compuesto',
-    rewardCredits: 110,
+    rewardCredits: 150,
   },
   {
     id: 'dir_orion_frontier',
-    code: 'DIR-05 · EXPANSIÓN ORBITAL',
-    title: 'Despliega en un Planeta de Tier II o superior en el Mapa Estelar',
+    code: 'DIR-05 · EXPANSIÓN DEL SECTOR NATAL',
+    title: 'Explora y despliega en un mundo de Tier II o III de tu Sector',
     description:
-      'Abre el Mapa Estelar, selecciona una órbita de Tier II, III o del Corredor de Orión y ejecuta un despliegue táctico.',
+      'Abre el Mapa Estelar, selecciona una órbita superior de tu sector natal y ejecuta un despliegue táctico.',
     targetTab: 'exploracion',
     actionLabel: 'Abrir Mapa Estelar',
-    rewardCredits: 150,
+    rewardCredits: 180,
+  },
+  {
+    id: 'dir_lab_research',
+    code: 'DIR-06 · AVANCE CIENTÍFICO',
+    title: 'Investiga al menos 1 Mejora Tecnológica en el Laboratorio',
+    description:
+      'Invierte materiales y créditos en el Laboratorio para desbloquear bonificaciones permanentes de MW, capacidad o combate.',
+    targetTab: 'ciudadela_laboratorio',
+    actionLabel: 'Abrir Laboratorio',
+    rewardCredits: 210,
+  },
+  {
+    id: 'dir_full_mk2_loadout',
+    code: 'DIR-07 · SINCRONIZACIÓN DE CHASIS COMPLETO',
+    title: 'Evoluciona las 5 piezas de tu Héroe a Grado Mk-II o superior',
+    description:
+      'Mejora Arma, Coraza, Casco, Guanteletes y Botas a Mk-II en la Forja para alcanzar el Nivel 2 completo del Héroe.',
+    targetTab: 'comandante',
+    actionLabel: 'Inspeccionar Equipamiento',
+    rewardCredits: 260,
+  },
+  {
+    id: 'dir_orion_corridor_deploy',
+    code: 'DIR-08 · INCURSIÓN EN EL CORREDOR DE ORIÓN',
+    title: 'Despliega en el Sector Neutral Corredor de Orión (Tier IV–V)',
+    description:
+      'Viaja al Corredor de Orión en el Mapa Estelar para enfrentar mercenarios y extraer recursos de Tier IV y V.',
+    targetTab: 'exploracion',
+    actionLabel: 'Viajar al Corredor de Orión',
+    rewardCredits: 320,
+  },
+  {
+    id: 'dir_bestiary_hunter',
+    code: 'DIR-09 · REGISTRO DE INTELIGENCIA HOSTIL',
+    title: 'Registra al menos 5 Especies Hostiles en el Códice de Amenazas',
+    description:
+      'Combate en distintos planetas para identificar unidades ligeras, medias, pesadas y Amenazas Raras de Élite en el archivo.',
+    targetTab: 'exploracion_hostiles',
+    actionLabel: 'Ver Archivo de Hostiles',
+    rewardCredits: 380,
+  },
+  {
+    id: 'dir_playtest_mastery',
+    code: 'DIR-10 · CULMINACIÓN DEL RECORRIDO DE PRUEBA',
+    title: 'Alcanza Nivel 4+ de Héroe y explora al menos 6 Planetas',
+    description:
+      'Evoluciona tu equipamiento a grados superiores y recorre los mundos del Sector Natal y del Corredor de Orión.',
+    targetTab: 'directivas',
+    actionLabel: 'Ver Hitos de Prueba',
+    rewardCredits: 550,
   },
 ];
+

@@ -1,6 +1,0 @@
-{
-  "summary":  "Plan de pulido final pre-publicación: encuadre desde el borde superior del casco y etiquetas unificadas Sector + Mundo Natal en Selección de Facción, bloqueo de sectores y planetas desactivados en el Archivo de Hostiles con igual tratamiento al Mapa Estelar, textos de Próximo Nivel en el menú lateral, versionado limpio y validación anti-NaN en localStorage, y catálogo detallado de unidades de los sectores habilitados.",
-  "updatedAt":  "2026-11-09T19:01:44.872287417Z",
-  "requestFeedback":  true,
-  "userFacing":  true
-}

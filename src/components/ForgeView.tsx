@@ -249,7 +249,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({
   facilityKind = 'forge',
   badgeSubtitle,
   title,
-  description = 'Sintetiza compuestos tácticos y evoluciona el Equipamiento del Comandante dentro del límite de MW del Reactor.',
+  description = 'Sintetiza compuestos y evoluciona el equipamiento, dentro del límite del reactor.',
   level,
   maxLevel = 20,
   reactorLevel,
@@ -286,7 +286,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({
     <header
       className={`w-full p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
     >
-      <div className="flex items-start gap-3.5 min-w-0">
+      <div className="flex items-center gap-3.5 min-w-0">
         <div
           className={`relative w-12 h-12 rounded-xl bg-[#182232]/80 border ${theme.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
         >
@@ -298,48 +298,40 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({
           </span>
         </div>
         <div className="flex flex-col min-w-0">
-          {badgeSubtitle && (
-            <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-300 mb-0.5">
-              <span className="font-bold uppercase tracking-wider">
-                {badgeSubtitle}
-              </span>
-              {drawMw !== undefined && (
-                <>
-                  <span className="text-slate-600">·</span>
-                  <span>Consumo: {drawMw} MW</span>
-                </>
-              )}
-              {reactorLevel !== undefined && !isMax && (
-                <>
-                  <span className="text-slate-600">·</span>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide leading-tight">
+              {title} · Nivel {level}
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-200">
+              {operationalEffect}
+            </span>
+            {(drawMw !== undefined || (reactorLevel !== undefined && !isMax)) && (
+              <span className="text-xs font-mono text-slate-400">
+                {drawMw !== undefined ? `Consumo: ${drawMw} MW` : ''}
+                {drawMw !== undefined && reactorLevel !== undefined && !isMax
+                  ? ' · '
+                  : ''}
+                {reactorLevel !== undefined && !isMax ? (
                   <span
                     className={
                       isCappedByReactor
-                        ? 'text-amber-200 font-semibold'
-                        : 'text-slate-300'
+                        ? 'text-amber-300 font-semibold'
+                        : 'text-slate-400'
                     }
                   >
                     Techo Reactor: Nv.{reactorLevel}
                   </span>
-                </>
-              )}
-            </div>
-          )}
-          <div className="flex items-baseline gap-3 flex-wrap">
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
-              {title} · Nivel {level}
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[13px] font-mono font-semibold text-slate-200">
-              {operationalEffect}
-            </span>
+                ) : null}
+              </span>
+            )}
           </div>
-          <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5 leading-relaxed">
+          <p className="text-[13px] sm:text-sm text-slate-300 mt-1 leading-snug">
             {description}
           </p>
         </div>
       </div>
 
-      {/* ZONA CENTRALIZADA DE MEJORA DE INSTALACIÓN (SIEMPRE EN EL MISMO LUGAR PARA FORJA, LABORATORIO Y SILO) */}
+      {/* ZONA CENTRALIZADA DE MEJORA DE INSTALACIÓN (MISMA JERARQUÍA Y DIMENSIONES EN LAS 4 INSTALACIONES) */}
       <div className="flex flex-wrap items-center gap-2.5 xl:justify-end shrink-0">
         <TutorialBeacon
           stepNumber={beaconStepNumber}
@@ -355,7 +347,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({
               <div
                 key={cost.id}
                 title={cost.label}
-                className={`px-3.5 py-2 rounded-xl border font-mono text-[13px] flex items-center gap-2 tabular-nums ${
+                className={`min-h-[42px] px-3.5 py-2 rounded-xl border font-mono text-[13px] flex items-center gap-2 tabular-nums ${
                   hasEnough
                     ? 'bg-black/45 border-white/12 text-slate-200'
                     : 'bg-rose-950/40 border-rose-500/35 text-rose-200'
@@ -376,7 +368,7 @@ export const FacilityHeader: React.FC<FacilityHeaderProps> = ({
           type="button"
           disabled={!canUpgrade || isMax || isUpgrading || isCappedByReactor}
           onClick={onUpgrade}
-          className={`min-h-[42px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider shrink-0 flex items-center gap-2 ${
+          className={`min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider shrink-0 flex items-center justify-center gap-2 ${
             isUpgrading
               ? 'bg-amber-950/60 border border-amber-400/50 text-amber-200 cursor-wait'
               : canUpgrade && !isMax && !isCappedByReactor
@@ -526,15 +518,41 @@ export const ActionCard: React.FC<ActionCardProps> = ({
           type="button"
           disabled={!canAfford}
           onClick={() => onAction(item)}
-          className={`w-full min-h-[44px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider ${
+          className={`w-full min-h-[44px] px-4 py-2 rounded-xl text-[13px] font-display font-bold uppercase tracking-wider flex items-center justify-center gap-2 ${
             canAfford
               ? `${theme.primaryButton} transition-colors cursor-pointer`
               : GLOBAL_UI.glass.disabledButton
           }`}
         >
-          {canAfford
-            ? `Sintetizar (+${item.outputAmount || 1})`
-            : 'Materiales Insuficientes'}
+          {canAfford ? (
+            `Sintetizar (+${item.outputAmount || 1})`
+          ) : (
+            <>
+              <Lock className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                {(() => {
+                  const missingMats = item.costs.filter(
+                    (c) => c.id !== 'credits' && (c.owned ?? 0) < c.required
+                  );
+                  const missingCredits = item.costs.some(
+                    (c) => c.id === 'credits' && (c.owned ?? 0) < c.required
+                  );
+                  if (missingMats.length > 0) {
+                    const needsCrafted = missingMats.some((c) =>
+                      c.id.includes('_craft_')
+                    );
+                    return needsCrafted
+                      ? 'Materiales Insuficientes · Sintetiza en Forja'
+                      : 'Materiales Insuficientes';
+                  }
+                  if (missingCredits) {
+                    return 'Créditos Insuficientes';
+                  }
+                  return 'Materiales Insuficientes';
+                })()}
+              </span>
+            </>
+          )}
         </button>
       )}
     </article>
@@ -657,8 +675,8 @@ export const ForgeView: React.FC<ForgeViewProps> = ({
       <FacilityHeader
         factionId={factionId}
         facilityKind="forge"
-        badgeSubtitle="División de Manufactura y Equipamiento"
         title={facilityTitle}
+        description="Sintetiza compuestos y evoluciona el equipamiento, dentro del límite del reactor."
         level={currentLevel}
         maxLevel={maxForgeLevel}
         reactorLevel={reactorLevel}
@@ -795,9 +813,17 @@ export const ForgeView: React.FC<ForgeViewProps> = ({
 
             const meetsForgeLevel = currentLevel >= req.requiredForgeLevel;
             const meetsMwBudget = reserveMw >= req.effectiveExtraMw;
-            const meetsResources = req.costs.every(
-              (c) => (c.owned ?? 0) >= c.required
+            const missingMaterials = req.costs.filter(
+              (c) => c.id !== 'credits' && (c.owned ?? 0) < c.required
             );
+            const missingCraftedCompound = missingMaterials.some((c) =>
+              c.id.includes('_craft_')
+            );
+            const meetsMaterials = missingMaterials.length === 0;
+            const creditCostObj = req.costs.find((c) => c.id === 'credits');
+            const meetsCredits =
+              !creditCostObj || (creditCostObj.owned ?? 0) >= creditCostObj.required;
+            const meetsResources = meetsMaterials && meetsCredits;
             const canEvolve =
               !isMaxSlot && meetsForgeLevel && meetsMwBudget && meetsResources;
 
@@ -969,10 +995,19 @@ export const ForgeView: React.FC<ForgeViewProps> = ({
                         Central
                       </span>
                     </>
-                  ) : !meetsResources ? (
+                  ) : !meetsMaterials ? (
                     <>
                       <Lock className="w-4 h-4 shrink-0" />
-                      <span>Sintetiza Compuestos en Pestaña 1</span>
+                      <span>
+                        {missingCraftedCompound
+                          ? 'Materiales Insuficientes · Sintetiza en Forja'
+                          : 'Materiales Insuficientes'}
+                      </span>
+                    </>
+                  ) : !meetsCredits ? (
+                    <>
+                      <Lock className="w-4 h-4 shrink-0" />
+                      <span>Créditos Insuficientes</span>
                     </>
                   ) : (
                     <>

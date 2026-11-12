@@ -158,60 +158,59 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
                 playGameSfx('ui_click');
                 setSelectedEntry(null);
               }}
-              className="px-4 py-2.5 rounded-xl bg-[#182232]/90 hover:bg-white/10 border border-slate-300/[0.18] text-[13px] font-mono font-bold text-slate-100 hover:text-white flex items-center gap-2 cursor-pointer transition-colors self-start sm:self-auto shrink-0"
+              className="min-h-[42px] px-4 py-2 rounded-xl bg-[#182232]/90 hover:bg-white/10 border border-slate-300/[0.18] text-[13px] font-mono font-bold text-slate-100 hover:text-white flex items-center gap-2 cursor-pointer transition-colors self-start sm:self-auto shrink-0"
             >
               <ArrowLeft className="w-4 h-4 shrink-0" />
               <span>Volver a Planetas</span>
             </button>
 
             <div className="flex items-center gap-3.5">
-              <div className="w-14 h-14 rounded-xl overflow-hidden border border-slate-300/[0.2] bg-[#090D15] shrink-0 shadow-md">
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-slate-300/[0.2] bg-[#090D15] shrink-0 shadow-md">
                 <img
                   src={planet.image}
                   alt={planet.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover contrast-[1.08] saturate-[1.08]"
                 />
               </div>
               <div className="flex flex-col">
-                <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-                  <span className="text-slate-300 uppercase tracking-wider font-bold">
-                    {sector.name}
-                  </span>
-                  <span className="text-slate-500">·</span>
-                  <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-100 font-bold">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wide">
+                    {planet.name} · Fauna y Fuerzas Hostiles
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-bold text-slate-100">
                     TIER {planet.tierRoman}
                   </span>
                   <span
-                    className={`px-2 py-0.5 rounded bg-white/5 border border-white/10 font-bold ${theme.accentText}`}
+                    className={`px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-bold ${theme.accentText}`}
                   >
                     AMENAZA NV. {planet.enemyLevel}
                   </span>
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+                    {sector.name}
+                  </span>
                 </div>
-                <h1 className="text-xl sm:text-2xl font-display font-bold text-white uppercase tracking-wide mt-0.5">
-                  {planet.name} · Fauna y Fuerzas Hostiles
-                </h1>
-                <p className="text-xs sm:text-[13px] text-slate-300">
+                <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
                   {planet.type} · Aparición dinámica en el Frente de Batalla según probabilidad orbital (%).
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             {routingMode === 'orbital' && (
-              <div className="px-3.5 py-2 rounded-xl bg-emerald-950/60 border border-emerald-400/45 font-mono text-xs text-emerald-200 flex items-center gap-2">
+              <div className="min-h-[42px] px-3.5 py-2 rounded-xl bg-emerald-950/60 border border-emerald-400/45 font-mono text-xs text-emerald-200 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-300 shrink-0" />
                 <span>Protocolo Orbital Activo: Amenaza Rara 6% (+3%)</span>
               </div>
             )}
 
             <div
-              className={`px-4 py-2 rounded-xl font-mono flex flex-col items-end ${GLOBAL_UI.glass.subcard}`}
+              className={`min-h-[42px] px-3.5 py-2 rounded-xl font-mono flex flex-col justify-center items-end ${GLOBAL_UI.glass.subcard}`}
             >
-              <span className="text-xs uppercase tracking-wider text-slate-400">
+              <span className="text-[11px] uppercase tracking-wider text-slate-400 leading-none">
                 Identificados en Órbita
               </span>
-              <span className="text-sm font-bold text-white tabular-nums">
+              <span className="text-sm font-bold text-white tabular-nums mt-0.5 leading-none">
                 {discoveredCount} / {hostiles.length} Hostiles
               </span>
             </div>
@@ -220,7 +219,7 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
               type="button"
               disabled={!isPlanetUnlockedForDeploy}
               onClick={() => onNavigateToSector(sector, planet)}
-              className={`px-4 py-2.5 rounded-xl border font-display text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
+              className={`min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl border font-display text-[13px] font-bold uppercase tracking-wider shrink-0 flex items-center justify-center gap-2 transition-all ${
                 isPlanetUnlockedForDeploy
                   ? `${theme.primaryButton} cursor-pointer active:scale-95`
                   : 'bg-slate-900/80 border-white/10 text-slate-400 cursor-not-allowed opacity-75'
@@ -460,16 +459,19 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
       <header
         className={`p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
       >
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-center gap-3.5">
           <div
             className={`w-12 h-12 rounded-xl bg-[#182232]/85 border ${theme.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
           >
             <Radar className={`w-6 h-6 ${theme.accentText}`} />
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-300">
-                INTELIGENCIA ORBITAL · SUBMÓDULO DE MAPA ESTELAR
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
+                {menuLabels.bestiarySubLabel}
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-bold text-slate-200">
+                Planetas y % de Aparición
               </span>
               <TutorialBeacon
                 stepNumber={1}
@@ -478,23 +480,20 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
                 factionId={factionId}
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
-              {menuLabels.bestiarySubLabel} · Planetas y % de Aparición
-            </h1>
             <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
-              Selecciona un planeta para consultar los hostiles que habitan su órbita, sus probabilidades de aparición (%) y el botín que entregan.
+              Selecciona un planeta para consultar los hostiles de su órbita, sus probabilidades de aparición (%) y su botín.
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div
-            className={`px-4 py-2.5 flex flex-col items-end font-mono ${GLOBAL_UI.glass.subcard}`}
+            className={`min-h-[42px] px-3.5 py-2 rounded-xl flex flex-col justify-center items-end font-mono ${GLOBAL_UI.glass.subcard}`}
           >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
+            <span className="text-[11px] uppercase tracking-wider text-slate-400 leading-none">
               Registro Galáctico
             </span>
-            <span className="text-base font-bold text-white tabular-nums">
+            <span className="text-sm font-bold text-white tabular-nums mt-0.5 leading-none">
               {totalDiscoveredInGalaxy} / {totalHostilesInGalaxy} Hostiles Identificados
             </span>
           </div>
@@ -502,7 +501,7 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
           <button
             type="button"
             onClick={onOpenStarMap}
-            className="px-4 py-2.5 rounded-xl bg-[#182232]/85 hover:bg-white/10 border border-slate-300/[0.16] text-[13px] font-display font-bold uppercase tracking-wider text-slate-100 hover:text-white flex items-center gap-2 cursor-pointer transition-colors"
+            className="min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl bg-[#182232]/85 hover:bg-white/10 border border-slate-300/[0.16] text-[13px] font-display font-bold uppercase tracking-wider text-slate-100 hover:text-white shrink-0 flex items-center justify-center gap-2 cursor-pointer transition-colors"
           >
             <Compass className="w-4 h-4 shrink-0" />
             <span>Ir al Mapa Estelar</span>
@@ -645,7 +644,7 @@ export const BestiarioView: React.FC<BestiarioViewProps> = ({
                     <img
                       src={planet.image}
                       alt={planet.name}
-                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 saturate-[0.88]"
+                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 contrast-[1.08] saturate-[1.08]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121926] via-[#121926]/35 to-transparent" />
 

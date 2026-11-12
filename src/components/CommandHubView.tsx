@@ -25,6 +25,7 @@ import {
   FACTION_MENU_LABELS,
   FACTION_REACTOR_SKINS,
   FACTION_RESOURCE_SPECS,
+  HERO_DASHBOARD_PORTRAITS_CATALOG,
   HERO_PORTRAITS_CATALOG,
   REACTOR_ROUTING_PROTOCOLS,
 } from '../data/factionIdentityCatalog';
@@ -144,94 +145,74 @@ export const CommandHubView: React.FC<CommandHubViewProps> = ({
       aria-label={menuLabels.hubLabel}
       className="w-full flex flex-col gap-5 text-slate-200 select-none animate-in fade-in duration-300"
     >
-      {/* CABECERA DE LA SALA DE GUERRA */}
+      {/* CABECERA UNIFICADA DE LA SALA DE GUERRA */}
       <header
-        className={`p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
+        className={`w-full p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 ${GLOBAL_UI.glass.panel}`}
       >
-        <div className="flex items-start gap-3.5">
+        <div className="flex items-center gap-3.5 min-w-0">
           <div
             className={`w-12 h-12 rounded-xl bg-[#182232]/80 border ${theme.accentBorder} flex items-center justify-center shrink-0 shadow-md`}
           >
             {renderFactionIcon(`w-6 h-6 ${theme.accentText}`)}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-slate-300">
-              {menuLabels.hubSubtitle}
-            </span>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide">
-              {menuLabels.hubLabel} · Visión Estratégica
-            </h1>
-            <p className="text-[13px] sm:text-sm text-slate-300 mt-0.5">
-              Supervisa tu Equipamiento y coordina el despliegue entre{' '}
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-display font-bold text-slate-100 uppercase tracking-wide leading-tight">
+                {menuLabels.hubLabel}
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-semibold text-slate-200">
+                {menuLabels.baseLabel} · Nv.{characterLevel}
+              </span>
+              {activeProtocolMeta && (
+                <span
+                  className={`px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-xs font-mono font-bold ${theme.accentText}`}
+                >
+                  {activeProtocolMeta.title} ({activeProtocolMeta.shortTag})
+                </span>
+              )}
+            </div>
+            <p className="text-[13px] sm:text-sm text-slate-300 mt-1 leading-snug">
+              Supervisa tu equipamiento, las instalaciones de{' '}
               <strong className="text-slate-100">{menuLabels.baseLabel}</strong>{' '}
-              y el{' '}
-              <strong className="text-slate-100">
-                {menuLabels.combatLabel}
-              </strong>
-              .
+              y el frente asignado.
             </p>
           </div>
         </div>
 
-        {/* TELEMETRÍA RÁPIDA DE CABECERA */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div
-            className={`px-4 py-2.5 flex flex-col items-end font-mono ${GLOBAL_UI.glass.subcard}`}
-          >
-            <span className="text-xs uppercase tracking-wider text-slate-400">
-              Red de {reactorSkin.reactorTitle}
+        {/* TELEMETRÍA Y ACCIÓN ESTANDARIZADA DE CABECERA (MISMA ALTURA 42PX QUE INSTALACIONES) */}
+        <div className="flex flex-wrap items-center gap-2.5 xl:justify-end shrink-0">
+          <div className="min-h-[42px] px-3.5 py-2 rounded-xl bg-black/45 border border-white/12 font-mono text-[13px] flex items-center gap-2 tabular-nums">
+            <Zap className={`w-4 h-4 shrink-0 ${theme.accentText}`} />
+            <span className="text-slate-300">{reactorSkin.reactorTitle}:</span>
+            <span className="font-bold text-white">
+              {usedReactorMw} / {maxReactorMw} MW
             </span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base font-bold text-white tabular-nums">
-                {usedReactorMw} / {maxReactorMw} MW
-              </span>
-              <span
-                className={`text-[13px] font-bold ${theme.accentText} tabular-nums`}
-              >
-                ({reserveReactorMw} Libres)
-              </span>
-            </div>
+            <span className={`font-bold ${theme.accentText}`}>
+              ({reserveReactorMw} Libres)
+            </span>
           </div>
-
-          {activeProtocolMeta && (
-            <div
-              className={`px-4 py-2.5 flex flex-col items-end font-mono ${GLOBAL_UI.glass.subcard}`}
-            >
-              <span className="text-xs uppercase tracking-wider text-slate-400">
-                Protocolo Activo
-              </span>
-              <span className={`text-sm font-bold ${theme.accentText}`}>
-                {activeProtocolMeta.title} ({activeProtocolMeta.shortTag})
-              </span>
-            </div>
-          )}
 
           <button
             type="button"
             onClick={() => onNavigateTab('directivas')}
-            className={`px-4 py-2.5 rounded-xl border text-left flex items-center gap-3 font-mono transition-all cursor-pointer ${
+            className={`min-h-[42px] min-w-[186px] px-4 py-2 rounded-xl border text-[13px] font-display font-bold uppercase tracking-wider shrink-0 flex items-center justify-center gap-2 transition-all cursor-pointer ${
               readyToClaimCount > 0
-                ? 'bg-emerald-950/50 border-emerald-400/50 hover:bg-emerald-950/70 shadow-[0_0_16px_rgba(16,185,129,0.2)]'
-                : 'bg-[#141C2B]/80 border-slate-300/[0.14] hover:border-white/25'
+                ? 'bg-emerald-950/60 border-emerald-400/60 text-emerald-100 hover:bg-emerald-950/80 shadow-[0_0_18px_rgba(16,185,129,0.3)]'
+                : 'bg-[#182232]/85 hover:bg-white/10 border-slate-300/[0.16] text-slate-100 hover:text-white'
             }`}
           >
             <Target
               className={`w-4 h-4 shrink-0 ${
                 readyToClaimCount > 0
-                  ? 'text-emerald-400 animate-pulse'
+                  ? 'text-emerald-300 animate-pulse'
                   : theme.accentText
               }`}
             />
-            <div className="flex flex-col">
-              <span className="text-xs uppercase tracking-wider text-slate-300">
-                {menuLabels.directivesLabel}
-              </span>
-              <span className="text-[13px] font-bold text-slate-100">
-                {readyToClaimCount > 0
-                  ? `${readyToClaimCount} Recompensa Lista`
-                  : `${unlockedAchievementsCount}/${achievements.length} Hitos`}
-              </span>
-            </div>
+            <span>
+              {readyToClaimCount > 0
+                ? `Reclamar (${readyToClaimCount})`
+                : `${menuLabels.directivesLabel} (${unlockedAchievementsCount}/${achievements.length})`}
+            </span>
           </button>
         </div>
       </header>
@@ -260,26 +241,28 @@ export const CommandHubView: React.FC<CommandHubViewProps> = ({
               />
             </div>
 
-            {/* TARJETA VISUAL DEL HÉROE */}
+            {/* TARJETA VISUAL DEL HÉROE (RETRATO INDEPENDIENTE DE 600x720 PX EN /assets/retratos-dashboard/*.jpg) */}
             <div className="relative rounded-xl overflow-hidden border border-slate-300/[0.14] bg-[#0D131E] p-4 flex items-center gap-4">
               <div
-                className={`relative w-24 h-28 rounded-xl overflow-hidden bg-[#080C14] border ${theme.accentBorder} shrink-0 shadow-[0_6px_18px_rgba(0,0,0,0.75)]`}
+                className={`relative w-28 h-[134px] sm:w-32 sm:h-[154px] aspect-[5/6] rounded-xl overflow-hidden bg-[#080C14] border ${theme.accentBorder} shrink-0 shadow-[0_8px_22px_rgba(0,0,0,0.85)]`}
               >
                 <img
                   src={
-                    currentFaction.portraitPath ||
+                    HERO_DASHBOARD_PORTRAITS_CATALOG[factionId] ||
                     HERO_PORTRAITS_CATALOG[factionId]
                   }
                   alt={`Retrato de ${currentFaction.name}`}
-                  className={`w-full h-full object-cover ${
-                    factionId === 'valari'
-                      ? 'object-[50%_7%]'
-                      : factionId === 'skithid'
-                        ? 'object-[50%_5%]'
-                        : 'object-[50%_3%]'
-                  } select-none pointer-events-none`}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.dataset.fallbackApplied) return;
+                    target.dataset.fallbackApplied = 'true';
+                    if (target.src.endsWith('.jpg')) {
+                      target.src = target.src.replace(/\.jpg$/, '.png');
+                    }
+                  }}
+                  className="w-full h-full object-cover object-center contrast-[1.04] select-none pointer-events-none"
                 />
-                <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/15 bg-gradient-to-t from-[#080C14]/70 via-transparent to-[#080C14]/20" />
+                <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/15 bg-gradient-to-t from-[#080C14]/55 via-transparent to-transparent" />
               </div>
 
               <div className="flex flex-col gap-2 min-w-0 flex-1">
@@ -428,13 +411,13 @@ export const CommandHubView: React.FC<CommandHubViewProps> = ({
             {/* TARJETA DEL PLANETA FIJADO EN EL FRENTE DE BATALLA */}
             {activePlanet && (
               <div className="rounded-xl overflow-hidden border border-slate-300/[0.15] bg-[#0E131D]/95 flex flex-col shadow-lg">
-                <div className="relative h-32 w-full overflow-hidden border-b border-slate-300/[0.12]">
+                <div className="relative h-36 w-full overflow-hidden border-b border-slate-300/[0.12] bg-[#060911]">
                   <img
                     src={activePlanet.image}
                     alt={activePlanet.name}
-                    className="w-full h-full object-cover object-right saturate-[0.84] brightness-[0.9] contrast-[1.05]"
+                    className="w-full h-full object-cover object-[78%_center] contrast-[1.1] saturate-[1.1] brightness-[1.02]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0E131D]/95 via-[#0E131D]/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#090D16] via-[#090D16]/55 to-transparent" />
                   <div className="absolute top-3 left-3.5 flex items-center gap-2 font-mono">
                     <span className="px-2.5 py-0.5 rounded-md bg-[#141C2B]/90 backdrop-blur-md border border-slate-300/[0.18] text-xs font-bold text-slate-100">
                       TIER {activePlanet.tierRoman}

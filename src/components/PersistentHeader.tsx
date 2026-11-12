@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import {
   Blocks,
   Box,
-  Cloud,
   Coins,
   Compass,
   Cpu,
+  MessageSquarePlus,
   Orbit,
   RotateCcw,
   Users,
@@ -33,7 +33,7 @@ export interface PersistentHeaderProps {
   onOpenFactionSelector?: () => void;
   onRestartTutorial?: () => void;
   isTutorialActive?: boolean;
-  onOpenWorkspaceModal?: () => void;
+  onOpenFeedbackModal?: () => void;
 }
 
 const ROUTING_LABELS: Record<
@@ -69,7 +69,7 @@ export const PersistentHeader: React.FC<PersistentHeaderProps> = ({
   onOpenFactionSelector,
   onRestartTutorial,
   isTutorialActive,
-  onOpenWorkspaceModal,
+  onOpenFeedbackModal,
 }) => {
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [isScrolledDown, setIsScrolledDown] = useState(false);
@@ -194,7 +194,7 @@ export const PersistentHeader: React.FC<PersistentHeaderProps> = ({
           </div>
         </div>
 
-        {/* DERECHA: Economía, Silo, Audio y Reinicio de Partida */}
+        {/* DERECHA: Economía, Silo, Comentarios, Audio y Reinicio de Partida */}
         <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
           {/* Créditos Globales */}
           <div
@@ -233,19 +233,19 @@ export const PersistentHeader: React.FC<PersistentHeaderProps> = ({
             <span className="text-xs text-slate-300">({occupancyPct}%)</span>
           </div>
 
-          {/* Enlace Google Workspace (Drive, Docs, Forms) */}
-          {onOpenWorkspaceModal && (
-            <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-0.5 shadow-sm">
+          {/* Botón Resaltado de Comentarios / Feedback para Usuarios de Prueba */}
+          {onOpenFeedbackModal && (
+            <div className="flex items-center bg-sky-950/60 border border-sky-400/50 rounded-xl p-0.5 shadow-[0_0_16px_rgba(56,189,248,0.22)]">
               <button
                 type="button"
-                onClick={onOpenWorkspaceModal}
-                className={`rounded-lg hover:bg-sky-500/20 text-sky-300 hover:text-white transition-colors flex items-center gap-1.5 text-[13px] font-mono font-semibold cursor-pointer whitespace-nowrap ${
-                  isCompact ? 'px-2 py-1' : 'px-2.5 py-1.5'
+                onClick={onOpenFeedbackModal}
+                className={`rounded-lg bg-sky-500/15 hover:bg-sky-500/30 text-sky-200 hover:text-white transition-all flex items-center gap-1.5 text-[13px] font-mono font-bold cursor-pointer whitespace-nowrap ${
+                  isCompact ? 'px-2.5 py-1' : 'px-3 py-1.5'
                 }`}
-                title="Enlace Google Workspace: Respaldo en Drive, Informes en Docs y Forms"
+                title="Dejar comentarios, sugerencias o reportes de prueba sobre el juego"
               >
-                <Cloud className="w-3.5 h-3.5 shrink-0 text-sky-400" />
-                {!isCompact && <span className="hidden sm:inline">Workspace</span>}
+                <MessageSquarePlus className="w-4 h-4 shrink-0 text-sky-300" />
+                {!isCompact && <span className="hidden sm:inline">Comentarios</span>}
               </button>
             </div>
           )}

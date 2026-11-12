@@ -181,7 +181,6 @@ export const StorageView: React.FC<StorageViewProps> = ({
       <FacilityHeader
         factionId={factionId}
         facilityKind="silo"
-        badgeSubtitle="Bóveda Logística y Desguace"
         title={skin.siloModuleName}
         description="Almacena materiales extraídos, compuestos de la Forja y convierte excedentes en Créditos (₡)."
         level={siloLevel}

@@ -44,7 +44,7 @@ import { ForgeView } from './ForgeView';
 import { OnboardingTutorialOverlay } from './OnboardingTutorialOverlay';
 import { PersistentHeader } from './PersistentHeader';
 import { StarMapView } from './StarMapView';
-import { GoogleWorkspaceModal } from './GoogleWorkspaceModal';
+import { FeedbackModal } from './FeedbackModal';
 
 const MainShell: React.FC = () => {
   const {
@@ -95,6 +95,9 @@ const MainShell: React.FC = () => {
     openForgeTab,
     combatSessionLoot,
     clearCombatSessionLoot,
+    restartCurrentIncursion,
+    advanceToNextPlanetIncursion,
+    nextUnlockedPlanetName,
     encounteredEnemyKeys,
     selectedEnemy,
     enemySquad,
@@ -135,8 +138,8 @@ const MainShell: React.FC = () => {
     resetGameProgress,
   } = useGameContext();
 
-  const [isCitadelMenuOpen, setIsCitadelMenuOpen] = useState<boolean>(true);
-  const [isMapMenuOpen, setIsMapMenuOpen] = useState<boolean>(true);
+  const [isCitadelMenuOpen, setIsCitadelMenuOpen] = useState<boolean>(false);
+  const [isMapMenuOpen, setIsMapMenuOpen] = useState<boolean>(false);
   const [isEditingCommanderName, setIsEditingCommanderName] =
     useState<boolean>(false);
   const [commanderNameDraft, setCommanderNameDraft] =
@@ -151,6 +154,7 @@ const MainShell: React.FC = () => {
   });
   const isResizingLogRef = useRef<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(() => getGlobalAudioMuted());
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState<boolean>(false);
 
   const handleStartLogResize = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -198,6 +202,30 @@ const MainShell: React.FC = () => {
     playGameSfx('ui_click', 0, 0.55);
   };
 
+  React.useEffect(() => {
+    if (isSelectingFaction) {
+      setIsCitadelMenuOpen(false);
+      setIsMapMenuOpen(false);
+    }
+  }, [isSelectingFaction, factionId]);
+
+  React.useEffect(() => {
+    if (
+      activeTab === 'ciudadela_reactor' ||
+      activeTab === 'ciudadela_forja' ||
+      activeTab === 'ciudadela_laboratorio' ||
+      activeTab === 'ciudadela_almacen'
+    ) {
+      setIsCitadelMenuOpen(true);
+    } else if (
+      activeTab === 'exploracion' ||
+      activeTab === 'combate' ||
+      activeTab === 'exploracion_hostiles'
+    ) {
+      setIsMapMenuOpen(true);
+    }
+  }, [activeTab]);
+
   // Pantalla inicial de Selección de Facciones a pantalla completa centrada
   if (isSelectingFaction) {
     return (
@@ -234,7 +262,9 @@ const MainShell: React.FC = () => {
     activeTab === 'ciudadela_almacen';
 
   const isMapTabActive =
-    activeTab === 'exploracion' || activeTab === 'exploracion_hostiles';
+    activeTab === 'exploracion' ||
+    activeTab === 'combate' ||
+    activeTab === 'exploracion_hostiles';
 
   const currentCitadelSection: CitadelSection =
     activeTab === 'ciudadela_forja'
@@ -252,8 +282,6 @@ const MainShell: React.FC = () => {
       return <Hexagon className="w-6 h-6 text-emerald-300 shrink-0" />;
     return <Cpu className="w-6 h-6 text-blue-400 shrink-0" />;
   };
-
-  const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
 
   return (
     <div
@@ -285,28 +313,17 @@ const MainShell: React.FC = () => {
         onOpenFactionSelector={openFactionSelector}
         onRestartTutorial={restartTutorial}
         isTutorialActive={isTutorialActive}
-        onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
+        onOpenFeedbackModal={() => setIsFeedbackModalOpen(true)}
       />
 
-      <GoogleWorkspaceModal
-        isOpen={isWorkspaceModalOpen}
-        onClose={() => setIsWorkspaceModalOpen(false)}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
         factionId={factionId}
+        factionName={currentFaction.name}
         playerName={playerName}
-        currentSaveJson={JSON.stringify(
-          {
-            playerName,
-            factionId,
-            credits,
-            characterLevel,
-            buildings,
-            inventory,
-            heroLoadout,
-            timestamp: Date.now(),
-          },
-          null,
-          2
-        )}
+        characterLevel={characterLevel}
+        locationName={planetOnlyName}
       />
 
       <div className="flex-1 w-full max-w-[2560px] mx-auto px-4 lg:px-7 py-5 flex flex-col lg:flex-row gap-5 items-start">
@@ -367,8 +384,8 @@ const MainShell: React.FC = () => {
                       <Pencil className="w-3.5 h-3.5 text-slate-400 opacity-60 group-hover:opacity-100 group-hover:text-slate-200 transition-opacity shrink-0" />
                     </button>
                   )}
-                  <span className="text-[13px] font-mono font-semibold text-slate-300 tabular-nums leading-snug mt-0.5">
-                    Héroe <strong className="text-white">Nv. {characterLevel}</strong>
+                  <span className={`text-[13px] font-mono font-bold ${theme.accentText} tabular-nums leading-snug mt-0.5`}>
+                    Nv. {characterLevel}
                   </span>
                 </div>
               </div>
@@ -393,7 +410,7 @@ const MainShell: React.FC = () => {
               <div className="flex flex-col gap-1.5 pt-1.5 border-t border-slate-300/[0.10]">
                 <div className="flex justify-between text-[13px] font-mono font-semibold text-slate-200 tabular-nums">
                   <span className="text-slate-300">
-                    Rango Operativo Nv. {professionLevel} · Próx. Nv.
+                    XP de Desarrollo · Nv. {professionLevel}
                   </span>
                   <span className={`font-bold ${theme.accentText}`}>
                     {professionXpPct}%
@@ -542,45 +559,29 @@ const MainShell: React.FC = () => {
                 )}
               </div>
 
-              {/* 3 y 4. HÉROE Y CHASIS, FRENTE DE BATALLA */}
-              {[
-                {
-                  id: 'comandante' as ModuleTab,
-                  label: menuLabels.heroLabel,
-                  icon: UserCheck,
-                },
-                {
-                  id: 'combate' as ModuleTab,
-                  label: menuLabels.combatLabel,
-                  icon: Crosshair,
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${
-                      isActive
-                        ? theme.activeNav
-                        : 'bg-transparent text-slate-200 border-transparent hover:bg-white/5 hover:text-white'
+              {/* 3. HÉROE Y EQUIPAMIENTO */}
+              <button
+                type="button"
+                onClick={() => setActiveTab('comandante')}
+                className={`w-full min-h-[44px] flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${
+                  activeTab === 'comandante'
+                    ? theme.activeNav
+                    : 'bg-transparent text-slate-200 border-transparent hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <UserCheck
+                    className={`w-5 h-5 shrink-0 ${
+                      activeTab === 'comandante' ? theme.accentText : 'text-slate-400'
                     }`}
-                  >
-                    <span className="flex items-center gap-3">
-                      <Icon
-                        className={`w-5 h-5 shrink-0 ${
-                          isActive ? theme.accentText : 'text-slate-400'
-                        }`}
-                      />
-                      <span className="text-sm font-display">{item.label}</span>
-                    </span>
-                  </button>
-                );
-              })}
+                  />
+                  <span className="text-sm font-display">
+                    {menuLabels.heroLabel}
+                  </span>
+                </span>
+              </button>
 
-              {/* 5. MAPA ESTELAR + SUBMENÚ HIJO (CARTOGRAFÍA ORBITAL Y ARCHIVO DE HOSTILES) */}
+              {/* 4. MAPA ESTELAR / DESPLIEGUE ORBITAL (OPCIÓN A: CARTOGRAFÍA -> FRENTE DE BATALLA · PLANETA -> ARCHIVO DE HOSTILES) */}
               <div className="flex flex-col gap-1">
                 <button
                   type="button"
@@ -620,6 +621,11 @@ const MainShell: React.FC = () => {
                         icon: Compass,
                       },
                       {
+                        id: 'combate' as ModuleTab,
+                        label: `${menuLabels.combatLabel} · ${planetOnlyName}`,
+                        icon: Crosshair,
+                      },
+                      {
                         id: 'exploracion_hostiles' as ModuleTab,
                         label: menuLabels.bestiarySubLabel,
                         icon: Radar,
@@ -638,13 +644,13 @@ const MainShell: React.FC = () => {
                               : 'bg-transparent text-slate-300 border-transparent hover:text-white hover:bg-white/5'
                           }`}
                         >
-                          <span className="flex items-center gap-2.5">
+                          <span className="flex items-center gap-2.5 min-w-0">
                             <SubIcon
                               className={`w-4 h-4 shrink-0 ${
                                 isSubActive ? theme.accentText : 'text-slate-400'
                               }`}
                             />
-                            <span>{sub.label}</span>
+                            <span className="truncate">{sub.label}</span>
                           </span>
                         </button>
                       );
@@ -835,6 +841,9 @@ const MainShell: React.FC = () => {
               onBasicAttack={executeBasicAttack}
               onUseSkill={executeSkill}
               onReturnToCitadel={() => setActiveTab('hub')}
+              onRestartIncursion={restartCurrentIncursion}
+              onAdvanceNextPlanet={advanceToNextPlanetIncursion}
+              nextPlanetName={nextUnlockedPlanetName}
               sessionLoot={combatSessionLoot}
               onClearSessionLoot={clearCombatSessionLoot}
               isTutorialActive={isTutorialActive}

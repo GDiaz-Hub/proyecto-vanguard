@@ -496,92 +496,92 @@ export function getTurnPortraitForSpriteUrl(spriteUrl?: string): string {
   if (spriteUrl.includes('/assets/turnos/')) {
     return spriteUrl
       .replace('hero-cb-', 'hero-')
-      .replace(/\.png$/i, '.jpg');
+      .replace(/\.(png|webp)$/i, '.jpg');
   }
   return spriteUrl
     .replace('/assets/unidades/', '/assets/turnos/')
     .replace('hero-cb-', 'hero-')
-    .replace(/\.png$/i, '.jpg');
+    .replace(/\.(png|webp)$/i, '.jpg');
 }
 
 export const UNIT_SPRITES_CATALOG: Record<string, string> = {
   // Sprites canónicos y de respaldo por facción
-  valari_line: '/assets/unidades/valari-media-automata-fundicion.png',
-  valari_skirmisher: '/assets/unidades/valari-ligera-rastreador-escoria.png',
-  valari_heavy: '/assets/unidades/valari-pesada-perforadora-vulcano.png',
-  skithid_line: '/assets/unidades/skithid-media-mantis-abisal.png',
-  skithid_skirmisher: '/assets/unidades/skithid-ligera-larva-feral.png',
-  skithid_heavy: '/assets/unidades/skithid-pesada-behemoth-quitinoso.png',
-  cygnus_line: '/assets/unidades/cygnus-media-espectro-cromo.png',
-  cygnus_skirmisher: '/assets/unidades/cygnus-ligera-sonda-taquionica.png',
-  cygnus_heavy: '/assets/unidades/cygnus-pesada-monolito-null.png',
-  neutral_line: '/assets/unidades/orion-media-mercenario-orion.png',
-  neutral_skirmisher: '/assets/unidades/orion-ligera-corsario-vacio.png',
-  neutral_heavy: '/assets/unidades/orion-pesada-demoledor-orbital.png',
+  valari_line: '/assets/unidades/valari-media-automata-fundicion.webp',
+  valari_skirmisher: '/assets/unidades/valari-ligera-rastreador-escoria.webp',
+  valari_heavy: '/assets/unidades/valari-pesada-perforadora-vulcano.webp',
+  skithid_line: '/assets/unidades/skithid-media-mantis-abisal.webp',
+  skithid_skirmisher: '/assets/unidades/skithid-ligera-larva-feral.webp',
+  skithid_heavy: '/assets/unidades/skithid-pesada-behemoth-quitinoso.webp',
+  cygnus_line: '/assets/unidades/cygnus-media-espectro-cromo.webp',
+  cygnus_skirmisher: '/assets/unidades/cygnus-ligera-sonda-taquionica.webp',
+  cygnus_heavy: '/assets/unidades/cygnus-pesada-monolito-null.webp',
+  neutral_line: '/assets/unidades/orion-media-mercenario-orion.webp',
+  neutral_skirmisher: '/assets/unidades/orion-ligera-corsario-vacio.webp',
+  neutral_heavy: '/assets/unidades/orion-pesada-demoledor-orbital.webp',
 
   // Sector 1: Bastión de Vaelor (SEC-VAL-01)
   valari_ligera_rastreador_escoria:
-    '/assets/unidades/valari-ligera-rastreador-escoria.png',
+    '/assets/unidades/valari-ligera-rastreador-escoria.webp',
   valari_media_automata_fundicion:
-    '/assets/unidades/valari-media-automata-fundicion.png',
+    '/assets/unidades/valari-media-automata-fundicion.webp',
   valari_pesada_perforadora_vulcano:
-    '/assets/unidades/valari-pesada-perforadora-vulcano.png',
+    '/assets/unidades/valari-pesada-perforadora-vulcano.webp',
   valari_elite_automata_aureo:
-    '/assets/unidades/valari-elite-automata-aureo.png',
+    '/assets/unidades/valari-elite-automata-aureo.webp',
 
   // Sector 2: Enjambre Progenitor (SEC-SKI-01)
   skithid_ligera_larva_feral:
-    '/assets/unidades/skithid-ligera-larva-feral.png',
+    '/assets/unidades/skithid-ligera-larva-feral.webp',
   skithid_media_mantis_abisal:
-    '/assets/unidades/skithid-media-mantis-abisal.png',
+    '/assets/unidades/skithid-media-mantis-abisal.webp',
   skithid_pesada_behemoth_quitinoso:
-    '/assets/unidades/skithid-pesada-behemoth-quitinoso.png',
+    '/assets/unidades/skithid-pesada-behemoth-quitinoso.webp',
   skithid_elite_matriarca_albina:
-    '/assets/unidades/skithid-elite-matriarca-albina.png',
+    '/assets/unidades/skithid-elite-matriarca-albina.webp',
 
   // Sector 3: Nexo de Caelum (SEC-CYG-01)
   cygnus_ligera_sonda_taquionica:
-    '/assets/unidades/cygnus-ligera-sonda-taquionica.png',
+    '/assets/unidades/cygnus-ligera-sonda-taquionica.webp',
   cygnus_media_espectro_cromo:
-    '/assets/unidades/cygnus-media-espectro-cromo.png',
+    '/assets/unidades/cygnus-media-espectro-cromo.webp',
   cygnus_pesada_monolito_null:
-    '/assets/unidades/cygnus-pesada-monolito-null.png',
+    '/assets/unidades/cygnus-pesada-monolito-null.webp',
   cygnus_elite_oraculo_cero:
-    '/assets/unidades/cygnus-elite-oraculo-cero.png',
+    '/assets/unidades/cygnus-elite-oraculo-cero.webp',
 
   // Sector 4: Corredor de Orión (SEC-NEU-WEST)
   orion_ligera_corsario_vacio:
-    '/assets/unidades/orion-ligera-corsario-vacio.png',
+    '/assets/unidades/orion-ligera-corsario-vacio.webp',
   orion_media_mercenario_orion:
-    '/assets/unidades/orion-media-mercenario-orion.png',
+    '/assets/unidades/orion-media-mercenario-orion.webp',
   orion_pesada_demoledor_orbital:
-    '/assets/unidades/orion-pesada-demoledor-orbital.png',
+    '/assets/unidades/orion-pesada-demoledor-orbital.webp',
   orion_elite_corsario_elite:
-    '/assets/unidades/orion-elite-corsario-elite.png',
+    '/assets/unidades/orion-elite-corsario-elite.webp',
 
   // Sector 5: Cinturón de Aethel (SEC-NEU-EAST)
   aethel_ligera_acechador_biomineral:
-    '/assets/unidades/aethel-ligera-acechador-biomineral.png',
+    '/assets/unidades/aethel-ligera-acechador-biomineral.webp',
   aethel_media_vanguardia_cismatica:
-    '/assets/unidades/aethel-media-vanguardia-cismatica.png',
+    '/assets/unidades/aethel-media-vanguardia-cismatica.webp',
   aethel_pesada_coloso_neutronico:
-    '/assets/unidades/aethel-pesada-coloso-neutronico.png',
+    '/assets/unidades/aethel-pesada-coloso-neutronico.webp',
   aethel_elite_hidra_iridio:
-    '/assets/unidades/aethel-elite-hidra-iridio.png',
+    '/assets/unidades/aethel-elite-hidra-iridio.webp',
 
   // Sector 6: La Falla de Vesper (SEC-NEU-01) + Jefes Épicos
   vesper_ligera_vastago_abisal:
-    '/assets/unidades/vesper-ligera-vastago-abisal.png',
+    '/assets/unidades/vesper-ligera-vastago-abisal.webp',
   vesper_media_custodio_precursor:
-    '/assets/unidades/vesper-media-custodio-precursor.png',
+    '/assets/unidades/vesper-media-custodio-precursor.webp',
   vesper_pesada_heraldo_vesper:
-    '/assets/unidades/vesper-pesada-heraldo-vesper.png',
+    '/assets/unidades/vesper-pesada-heraldo-vesper.webp',
   vesper_elite_serafin_abisal:
-    '/assets/unidades/vesper-elite-serafin-abisal.png',
+    '/assets/unidades/vesper-elite-serafin-abisal.webp',
   vesper_jefe_arquitecto_primordial:
-    '/assets/unidades/vesper-jefe-arquitecto-primordial.png',
+    '/assets/unidades/vesper-jefe-arquitecto-primordial.webp',
   vesper_jefe_vesperion_abisal:
-    '/assets/unidades/vesper-jefe-vesperion-abisal.png',
+    '/assets/unidades/vesper-jefe-vesperion-abisal.webp',
 };
 
 export interface SquadUnitTemplate {
@@ -1329,7 +1329,7 @@ export function getPlanetHostilesRoster(
 
     const spriteUrl =
       UNIT_SPRITES_CATALOG[spec.spriteKey] ||
-      `/assets/unidades/hero-cb-${spec.factionStyle}.png`;
+      `/assets/unidades/hero-cb-${spec.factionStyle}.webp`;
 
     return {
       unitKey: `${planetId}__${spec.name}`,

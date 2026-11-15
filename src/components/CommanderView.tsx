@@ -696,7 +696,7 @@ export const CommanderView: React.FC<CommanderViewProps> = ({
     heroLoadout.helmet.secondaryStat?.type === 'reconLuck'
       ? heroLoadout.helmet.secondaryStat.value
       : 0;
-  const heroSpriteSrc = `/assets/unidades/hero-${currentFaction.id}.png`;
+  const heroSpriteSrc = `/assets/unidades/hero-${currentFaction.id}.webp`;
 
   const handleSelectSlot = (slot: HeroChassisSlot) => {
     setPinnedSlot((prev) => (prev === slot ? null : slot));

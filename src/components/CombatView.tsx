@@ -87,9 +87,9 @@ export interface CombatViewProps {
 }
 
 export const HERO_CB_SPRITES: Record<FactionId, string> = {
-  valari: '/assets/unidades/hero-cb-valari.png',
-  skithid: '/assets/unidades/hero-cb-skithid.png',
-  cygnus: '/assets/unidades/hero-cb-cygnus.png',
+  valari: '/assets/unidades/hero-cb-valari.webp',
+  skithid: '/assets/unidades/hero-cb-skithid.webp',
+  cygnus: '/assets/unidades/hero-cb-cygnus.webp',
 };
 
 const DEFAULT_STAGE: Required<CombatStageProps> = {

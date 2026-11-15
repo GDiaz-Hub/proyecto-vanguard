@@ -227,7 +227,7 @@ export const OnboardingTutorialOverlay: React.FC<OnboardingTutorialOverlayProps>
           <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
             <Compass className={`w-4 h-4 ${theme.accentText} shrink-0`} />
             <span>
-              Asesoría de Mando Activa · Reabre este informe cuando lo necesites desde el botón &ldquo;Guía&rdquo; en la barra superior.
+              Reabre este informe cuando lo necesites desde el botón &ldquo;Guía&rdquo; en la barra superior.
             </span>
           </div>
 
@@ -237,7 +237,7 @@ export const OnboardingTutorialOverlay: React.FC<OnboardingTutorialOverlayProps>
             className={`ml-auto px-6 py-2.5 rounded-xl border text-xs sm:text-sm font-display font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer active:scale-95 whitespace-nowrap ${theme.primaryButton}`}
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Entendido · Operar en esta Pantalla</span>
+            <span>Entendido</span>
           </button>
         </div>
       </div>

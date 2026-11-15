@@ -125,7 +125,7 @@ export const FACTION_THEMES: Record<string, FactionThemeTokens> = {
     selectedSlot: 'border-amber-400/50 ring-1 ring-amber-400/35',
     lineColor: 'rgba(245, 158, 11, 0.40)',
     lineActiveColor: '#FBBF24',
-    bgImage: '/assets/backgrounds/bg-faction-valari.png',
+    bgImage: '/assets/backgrounds/bg-faction-valari.webp',
     combatPalette: {
       damageClass: 'text-amber-300',
       defenseClass: 'text-slate-200',
@@ -161,7 +161,7 @@ export const FACTION_THEMES: Record<string, FactionThemeTokens> = {
     selectedSlot: 'border-emerald-400/50 ring-1 ring-emerald-400/35',
     lineColor: 'rgba(16, 185, 129, 0.40)',
     lineActiveColor: '#34D399',
-    bgImage: '/assets/backgrounds/bg-faction-skithid.png',
+    bgImage: '/assets/backgrounds/bg-faction-skithid.webp',
     combatPalette: {
       damageClass: 'text-emerald-300',
       defenseClass: 'text-teal-200',
@@ -197,7 +197,7 @@ export const FACTION_THEMES: Record<string, FactionThemeTokens> = {
     selectedSlot: 'border-blue-400/50 ring-1 ring-blue-400/35',
     lineColor: 'rgba(59, 130, 246, 0.40)',
     lineActiveColor: '#60A5FA',
-    bgImage: '/assets/backgrounds/bg-faction-cygnus.png',
+    bgImage: '/assets/backgrounds/bg-faction-cygnus.webp',
     combatPalette: {
       damageClass: 'text-blue-300',
       defenseClass: 'text-sky-200',

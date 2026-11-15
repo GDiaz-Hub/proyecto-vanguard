@@ -290,7 +290,7 @@ const MainShell: React.FC = () => {
     >
       <div className="fixed inset-0 z-[-1] bg-[#0E141F] overflow-hidden pointer-events-none">
         <img
-          src={theme.bgImage || '/assets/backgrounds/bg-faction-valari.png'}
+          src={theme.bgImage || '/assets/backgrounds/bg-faction-valari.webp'}
           alt=""
           className="w-full h-full object-cover opacity-50 saturate-[0.82] brightness-[0.88] transition-opacity duration-700"
         />

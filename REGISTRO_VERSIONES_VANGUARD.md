@@ -4,6 +4,26 @@
 
 ---
 
+## [v0.5.1] — 2026-11-14 · Optimización Integral de Imágenes y Velocidad de Carga (-66.1% de Peso)
+
+### Optimizaciones de Rendimiento y Peso de Assets (`48.91 MB` → `16.56 MB`, ahorro de `32.35 MB`)
+- **Conversión de Fondos de Interfaz con Transparencia a `.webp` con Canal Alfa (`14.43 MB` → `3.42 MB`, `-76.3%`)**:
+  - `public/assets/backgrounds/bg-faction-{valari,skithid,cygnus}.webp` conservando el `100%` del canal Alfa y su resolución `1920×1080`.
+- **Conversión de Retratos Opacos de Selección de Facción a `.webp` (`9.26 MB` → `1.13 MB`, `-87.8%`)**:
+  - `public/assets/{valari,skithid,cygnus}.webp` (`941×1672 px`).
+- **Conversión de Hologramas del Esquema Biométrico (`CommanderView`) a `.webp` con Canal Alfa (`4.83 MB` → `1.04 MB`, `-78.5%`)**:
+  - `public/assets/unidades/hero-{valari,skithid,cygnus}.webp` manteniendo sus dimensiones exactas (`1122×1402 px`), transparencia y alineación de pedestal/máscaras.
+- **Conversión 100% Sin Pérdida (`-lossless 1`) de los 29 Sprites de Combate a `.webp` (`2.83 MB` → `2.01 MB`, `-28.8%`)**:
+  - `public/assets/unidades/hero-cb-{valari,skithid,cygnus}.webp` y las 26 unidades hostiles conservan bit a bit cada píxel RGBA `(r, g, b, a)` y sus dimensiones nativas para que las máscaras de Canvas 2D (`getValariRifleRailMask`, `getSkithidBladeMasks`, `getCygnusForearmMask`) funcionen sin alteración.
+- **Optimización Progresiva de Archivos `.jpg` Manteniendo Formato (`18.46 MB` → `9.02 MB`, `-51.1%`)**:
+  - `public/assets/retratos-dashboard/*.jpg` (`600×720 px`): `1,210 KB` → `448 KB` (`-63%`).
+  - `public/assets/arenas/*.jpg` (`1280×720 px` HD progresivo): `12.83 MB` → `5.49 MB` (`-57.2%`).
+  - `public/assets/planets/cards/*.jpg` (`720×256 px`): `1,333 KB` → `596 KB` (`-55.3%`).
+  - `public/assets/turnos/*.jpg` (`128×128 px`): `407 KB` → `207 KB` (`-49.1%`).
+  - `public/assets/backgrounds/sectors/*.jpg` y `galaxy-vanguard-16x9.jpg`: `2,676 KB` → `2,482 KB`.
+
+---
+
 ## [v0.5.0] — 2026-11-11 · Balística Cinética Valari, Retratos Dedicados JPG y Auditoría Pre-Publicación
 
 ### Nuevas Características y Efectos de Combate

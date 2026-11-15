@@ -533,3 +533,90 @@ Si deseas que la IA mantenga este registro de manera automática e infalible en 
    - `REGISTRO_VERSIONES_VANGUARD.md`: Nuevo archivo privado en la raíz del proyecto con el historial de versiones, rendimiento y bugs corregidos.
    - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#23`.
 7. **Fuente de Atribución:** Dos mensajes directos del usuario del `2026-11-11`.
+
+---
+
+### Entrada #24 — Auditoría Técnica Integral de Gameplay, Sistemas, Fórmulas y Balance (`VANGUARD_GAMEPLAY_MASTER.md`)
+1. **ID, Fecha y Área:** `Entrada #24` · `2026-11-12` · Área: Auditoría Técnica Integral de Gameplay, Fórmulas de Combate, Economía, Progresión y Balance (`VANGUARD_GAMEPLAY_MASTER.md`).
+2. **Intención del Usuario:**
+   - Realizar una auditoría técnica integral de todo el código fuente del proyecto Vanguard para generar el documento maestro `/VANGUARD_GAMEPLAY_MASTER.md` con el estado real implementado del juego, sin propuestas de diseño ni modificaciones al código fuente: *"Necesito que realices una auditoría integral del proyecto Vanguard que tenés actualmente cargado en este entorno. Tu tarea es analizar el código fuente, las configuraciones, los datos, las fórmulas y los sistemas funcionales del juego para generar un documento maestro que describa con exactitud cómo funciona actualmente el gameplay. No quiero una propuesta de diseño ni una reinterpretación de las mecánicas. Quiero documentar el estado real del juego implementado... 9. No modifiques el código durante esta auditoría. 10. No equilibres ni cambies las estadísticas por iniciativa propia."*
+3. **Idea o Propuesta Aportada por la IA:**
+   - Inspección completa del 100 % de los módulos del repositorio (`src/types/*`, `src/data/*`, `src/context/*`, `src/components/*`, `src/utils/*`, `server.ts`) y redacción exhaustiva de `/VANGUARD_GAMEPLAY_MASTER.md` con las 15 secciones requeridas, incluyendo fórmulas matemáticas exactas, variables, líneas de código, ejemplos numéricos resueltos paso a paso, tablas completas de los 26 enemigos, 24 recursos, 23 planetas, 5 piezas de Chasis (`Mk-I` a `Mk-V`), 4 instalaciones y 3 tecnologías.
+   - Detección y documentación rigurosa de funciones desconectadas/duplicadas (`resolveCombatStrike`, `getCharacterLevelInfo`, `getProfessionLevelInfo`, `getSiloMaxCapacity`, `playerBuffTurns`), discrepancias entre textos y código (regeneración de escudo Cygnus `3.5%` real vs `6%/10%` en texto; bono de Ruptura `55%/35%` real vs `50%` en texto; velocidad de botas `+3*level` en UI vs `+8` fijo en `buildInitialTurnOrder`), homogeneización de estadísticas enemigas en `scaleHostileToPlanet`, temporizador local volátil en `ForgeView` y ausencia de bloqueo en el tope del Silo Logístico.
+4. **Aceptación, Cambios o Rechazos del Usuario:**
+   - Ejecución estricta de las 10 reglas de auditoría solicitadas por el usuario (sin tocar código fuente ni alterar estadísticas).
+5. **Resultado y Estado:** `Implementado y verificado`.
+6. **Archivos Afectados:**
+   - `VANGUARD_GAMEPLAY_MASTER.md`: Creación del documento maestro técnico con las 15 secciones de la auditoría integral.
+   - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#24`.
+7. **Fuente de Atribución:** Mensaje directo del usuario del `2026-11-12` e inspección directa de los archivos de código fuente del repositorio.
+
+
+
+### Entrada #25
+- **Fecha:** 2026-11-12
+- **Área del proyecto:** Documentación Técnica / Auditoría de Balance y Sistemas Pendientes (`VANGUARD_BALANCE_CHANGELOG.md`, `VANGUARD_PENDING_SYSTEMS.md` y sincronización de `VANGUARD_GAMEPLAY_MASTER.md`)
+- **Intención del usuario:** Generar los dos documentos restantes de la auditoría técnica como archivos Markdown independientes en la raíz del proyecto, coherentes con el documento maestro y sin modificar el código del juego: *"Ahora necesito que generes los otros dos documentos como archivos Markdown independientes: 1. VANGUARD_BALANCE_CHANGELOG.md ... 2. VANGUARD_PENDING_SYSTEMS.md ... Ambos documentos deben ser coherentes con el VANGUARD_GAMEPLAY_MASTER.md generado anteriormente. No modifiques el código del juego."*
+- **Propuesta / aporte de la IA:**
+  - Creación de `VANGUARD_BALANCE_CHANGELOG.md` con las 7 modificaciones históricas verificables en el repositorio (`[BAL-001]` a `[BAL-007]`), la tabla de línea base oficial de parámetros (`v0.5.0` en `GAME_BALANCE` y `GameContext.tsx`) y la plantilla estructurada para futuros cambios de balance.
+  - Creación de `VANGUARD_PENDING_SYSTEMS.md` diferenciando en Parte A los hallazgos en código (`IMPLEMENTADO PARCIALMENTE`, `PRESENTE VISUALMENTE, PERO SIN FUNCIONALIDAD REAL`, `CONFIGURADO, PERO NO CONECTADO`, contradicciones de texto y código legacy en `gameData.ts`) y en Parte B las propuestas documentadas en la bitácora aún no desarrolladas.
+  - Sincronización de precisión en `VANGUARD_GAMEPLAY_MASTER.md` frente a `src/context/GameContext.tsx` y `src/data/factionIdentityCatalog.ts` para garantizar cero contradicciones entre los tres documentos maestros.
+- **Decisión del usuario:** Solicitó directamente la entrega y verificación de coherencia de ambos archivos independientes sin tocar el código fuente.
+- **Resultado y estado:** Implementado y verificado.
+- **Archivos afectados:**
+  - `VANGUARD_BALANCE_CHANGELOG.md`: Creación del registro histórico de balance, línea base `v0.5.0` y plantilla de cambios futuros.
+  - `VANGUARD_PENDING_SYSTEMS.md`: Creación del inventario de sistemas parciales, elementos visuales sin conexión, sectores bloqueados (`hazardLocked`), código legacy y propuestas pendientes.
+  - `VANGUARD_GAMEPLAY_MASTER.md`: Sincronización de tablas y referencias con `GameContext.tsx` y `factionIdentityCatalog.ts` para coherencia total entre los tres documentos.
+  - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#25`.
+- **Fuente de respaldo:** Mensaje literal del usuario en el turno actual e inspección directa de `src/context/GameContext.tsx`, `src/data/factionIdentityCatalog.ts`, `src/components/ForgeView.tsx`, `src/components/CommanderView.tsx`, `src/data/starMap.data.ts` y `BITACORA_INTERCAMBIOS_VANGUARD.md`.
+
+### Entrada #26
+- **Fecha:** 2026-11-13
+- **Área del proyecto:** Sistema de Feedback / Botón de Comentarios (`src/components/FeedbackModal.tsx` y `server.ts`)
+- **Intención del usuario:** Consultar si el botón de Comentarios realmente funciona o no para recibir feedback: *"realmente el boton de comentarios no funciona no?"*
+- **Propuesta / aporte de la IA:**
+  - Auditoría técnica sincera del flujo real en `src/components/FeedbackModal.tsx` y `server.ts`:
+    1. En el entorno de desarrollo local de AI Studio (`ais-dev`), `server.ts` sí escribe en `COMENTARIOS_USUARIOS_VANGUARD.json` y `COMENTARIOS_USUARIOS_VANGUARD.md`.
+    2. Sin embargo, cuando un usuario externo entra por el **enlace compartido/publicado (`ais-pre`)** o por un despliegue estático (GitHub Pages / Vercel), **los comentarios nunca llegan a los archivos de tu editor**: en `ais-pre` el contenedor publicado está aislado del workspace de desarrollo (y es efímero al escalar a cero), y en hosting estático `/api/feedback` no existe, por lo que `FeedbackModal.tsx:217-226` cae en el `catch` y guarda el comentario **únicamente en el `localStorage` del navegador de ese usuario**, mostrándole igualmente el cartel de éxito aunque el creador nunca lo reciba.
+  - Se explican las alternativas reales en caso de querer recibir comentarios de terceros desde cualquier link (conectar una base de datos persistente en la nube como Firebase Firestore, o retirar el botón si no se desea usar).
+- **Decisión del usuario:** Consulta informativa pendiente de decisión sobre si desea conectarlo a base de datos real o eliminarlo.
+- **Resultado y estado:** Verificado e informado (sin modificar código fuente).
+- **Archivos afectados:**
+  - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#26`.
+- **Fuente de respaldo:** Mensaje literal del usuario en el turno actual e inspección directa de `src/components/FeedbackModal.tsx`, `server.ts`, `COMENTARIOS_USUARIOS_VANGUARD.json` y `COMENTARIOS_USUARIOS_VANGUARD.md`.
+
+### Entrada #27
+- **Fecha:** 2026-11-14
+- **Área del proyecto:** Optimización de Rendimiento y Recursos Gráficos (`/public/assets/*`) y ajuste manual en `src/components/OnboardingTutorialOverlay.tsx`
+- **Intención del usuario:**
+  1. *(Edición manual previa del usuario en `src/components/OnboardingTutorialOverlay.tsx`)*: Simplificó el texto inferior del modal de guía (*"Reabre este informe cuando lo necesites desde el botón “Guía” en la barra superior."*) y acortó el botón de cierre de *"Entendido · Operar en esta Pantalla"* a *"Entendido"*.
+  2. Solicitar un diagnóstico y plan detallado antes de optimizar el peso y formato de las imágenes del proyecto respetando la transparencia donde sea necesaria: *"Optimiza el tamaño de las imagenes en general de ser necesario cambiales el formato, manteniendo la transparencia si es que lo necesitan. Antes de ejecutar algo explica que podes realizar y que archivos podrias optimizar, listalos."*
+- **Propuesta / aporte de la IA:**
+  - Inspección completa sin modificar archivos sobre los **123 archivos de imagen (`48.91 MB` totales)** en `/public/assets`, verificando dimensiones reales, presencia de canal Alfa (`opaque=true/false`) y referencias en `src/`.
+  - Propuesta detallada dividida en 6 grupos de archivos con estimación de reducción de peso (de `~48.91 MB` a `~6–9 MB`, ahorro superior al `80%`), manteniendo intacta la transparencia (canal Alfa) en todos los fondos traslúcidos (`bg-faction-*.png`), hologramas de equipamiento (`hero-*.png`) y sprites de combate (`unidades/*.png`), y preservando las dimensiones o coordenadas normalizadas para no descalibrar máscaras ni efectos de armas en `CombatView.tsx` y `CommanderView.tsx`.
+- **Decisión del usuario:** Solicitó expresamente la explicación y el listado completo antes de ejecutar cualquier cambio (*"Antes de ejecutar algo explica que podes realizar y que archivos podrias optimizar, listalos"*).
+- **Resultado y estado:** Propuesto (a la espera de confirmación del usuario para ejecutar la optimización).
+- **Archivos afectados:**
+  - `src/components/OnboardingTutorialOverlay.tsx`: Editado manualmente por el usuario (texto de pie de modal y botón *"Entendido"*).
+  - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#27`.
+- **Fuente de respaldo:** Diff del sistema sobre `src/components/OnboardingTutorialOverlay.tsx`, mensaje literal del usuario en el turno actual e inspección con `file`/`identify` de los 123 archivos en `/public/assets`.
+
+### Entrada #28
+- **Fecha:** 2026-11-14
+- **Área del proyecto:** Optimización de Imágenes y Velocidad de Carga (`/public/assets/*`, `src/data/*`, `src/components/*` y `REGISTRO_VERSIONES_VANGUARD.md`)
+- **Intención del usuario:** Autorizar la ejecución de la optimización más eficiente para la velocidad de carga manteniendo la fidelidad visual y las transparencias: *"Ejecuta lo mas optimo para velocidad de carga, manteniendo la calidad lo mas fiel posible, de ser necesario si un archivo seria mas optimo en otro formato, tenes permitido cambiarlo, sin roper las transparencias."*
+- **Propuesta / aporte de la IA:**
+  - Conversión de los fondos con transparencia (`bg-faction-{valari,skithid,cygnus}.png` → `.webp` con canal Alfa, bajando de `14.43 MB` a `3.42 MB`), retratos opacos de facción (`{valari,skithid,cygnus}.png` → `.webp`, bajando de `9.26 MB` a `1.13 MB`), hologramas de `CommanderView` (`hero-{valari,skithid,cygnus}.png` → `.webp` con canal Alfa `quality 90`, bajando de `4.83 MB` a `1.04 MB`) y los 29 sprites de combate en `public/assets/unidades/*.png` a **`.webp` 100% sin pérdida (`-lossless 1`)** (`2.83 MB` → `2.01 MB`) para preservar bit a bit los píxeles RGBA leídos por las máscaras de armas en `CombatView.tsx`.
+  - Re-compresión en `.jpg` progresivo sin metadatos de `retratos-dashboard/*.jpg` (`1.21 MB` → `448 KB`, conservando `600×720 .jpg`), `turnos/*.jpg` (`407 KB` → `207 KB`, conservando `128×128 .jpg`), `planets/cards/*.jpg` (`1.33 MB` → `596 KB`), `arenas/*.jpg` (`12.83 MB` → `5.49 MB` en `1280×720` HD) y `backgrounds/sectors/*.jpg` (`2.37 MB` → `2.20 MB`).
+  - Reducción global de `/public/assets` de **`48.91 MB` a `16.56 MB`** (**ahorro de `32.35 MB` / `-66.1%`**).
+- **Decisión del usuario:** Aprobó ejecutar la optimización completa cambiando formato donde fuera más óptimo y preservando las transparencias.
+- **Resultado y estado:** Implementado y verificado.
+- **Archivos afectados:**
+  - `public/assets/backgrounds/bg-faction-{valari,skithid,cygnus}.webp`: Convertidos de `.png` a `.webp` con canal Alfa.
+  - `public/assets/{valari,skithid,cygnus}.webp`: Convertidos de `.png` opacos a `.webp`.
+  - `public/assets/unidades/*.webp` (32 archivos): 3 hologramas `hero-*.webp` con canal Alfa y 29 sprites de combate en `.webp` lossless (`-lossless 1`).
+  - `public/assets/arenas/*.jpg`, `public/assets/retratos-dashboard/*.jpg`, `public/assets/planets/cards/*.jpg`, `public/assets/turnos/*.jpg`, `public/assets/backgrounds/sectors/*.jpg`: Optimizados en `.jpg` progresivo.
+  - `src/data/themeConfig.ts`, `src/data/gameData.ts`, `src/data/factionIdentityCatalog.ts`, `src/components/MainLayout.tsx`, `src/components/CommanderView.tsx`, `src/components/CombatView.tsx`: Actualización de referencias `.png` a `.webp`.
+  - `REGISTRO_VERSIONES_VANGUARD.md`: Registro de la versión `[v0.5.1]`.
+  - `BITACORA_INTERCAMBIOS_VANGUARD.md`: Registro de la Entrada `#28`.
+- **Fuente de respaldo:** Mensaje literal del usuario en el turno actual y verificación de tamaños y compilación en el proyecto.
